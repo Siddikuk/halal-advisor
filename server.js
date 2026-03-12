@@ -5,8 +5,61 @@ const Anthropic = require('@anthropic-ai/sdk');
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Stripe = require('stripe');
 
 const app = express();
+
+// ── Stripe webhook must receive raw body — register BEFORE express.json() ──
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('[webhook] STRIPE_WEBHOOK_SECRET not set');
+    return res.status(500).send('Webhook secret not configured');
+  }
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('[webhook] Signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object;
+      if (session.mode === 'subscription') {
+        db.prepare('UPDATE users SET subscription_status = ?, stripe_subscription_id = ? WHERE stripe_customer_id = ?')
+          .run('active', session.subscription, session.customer);
+        console.log('[webhook] Subscription activated for customer', session.customer);
+      }
+      break;
+    }
+    case 'customer.subscription.updated': {
+      const sub = event.data.object;
+      const status = sub.status === 'active' ? 'active' : sub.status;
+      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
+        .run(status, sub.customer);
+      console.log('[webhook] Subscription updated:', status, 'for', sub.customer);
+      break;
+    }
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object;
+      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
+        .run('cancelled', sub.customer);
+      console.log('[webhook] Subscription cancelled for', sub.customer);
+      break;
+    }
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object;
+      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
+        .run('past_due', invoice.customer);
+      console.log('[webhook] Payment failed for', invoice.customer);
+      break;
+    }
+  }
+  res.json({ received: true });
+});
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -32,6 +85,15 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
 `);
+// Migrate: add subscription columns if they don't exist yet
+['ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT "trialing"',
+ 'ALTER TABLE users ADD COLUMN stripe_customer_id TEXT',
+ 'ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT'
+].forEach(sql => { try { db.exec(sql); } catch {} });
+
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
+  : null;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'halal-advisor-dev-secret-change-in-production';
 const TRIAL_DAYS = 14;
@@ -88,7 +150,15 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/user/me', authMiddleware, (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
   if (!user) return res.status(404).json({ error: 'User not found.' });
-  res.json({ email: user.email, trialDaysLeft: trialDaysLeft(user.trial_start) });
+  const days = trialDaysLeft(user.trial_start);
+  const subscriptionStatus = user.subscription_status || 'trialing';
+  const hasAccess = days > 0 || subscriptionStatus === 'active';
+  res.json({
+    email: user.email,
+    trialDaysLeft: days,
+    subscriptionStatus,
+    hasAccess
+  });
 });
 
 // GET /api/user/data — load all user data keys
@@ -276,6 +346,66 @@ RESPONSE GUIDELINES
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+// ─────────────────────────────────────────────
+// STRIPE PAYMENTS
+// ─────────────────────────────────────────────
+
+// POST /api/stripe/create-checkout-session
+app.post('/api/stripe/create-checkout-session', authMiddleware, async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to your environment.' });
+  if (!process.env.STRIPE_PRICE_ID) return res.status(500).json({ error: 'STRIPE_PRICE_ID not configured.' });
+
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+
+  try {
+    // Create or reuse Stripe customer
+    let customerId = user.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: user.email });
+      customerId = customer.id;
+      db.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').run(customerId, user.id);
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${appUrl}/?subscribed=1`,
+      cancel_url: `${appUrl}/`,
+      allow_promotion_codes: true,
+      subscription_data: {
+        metadata: { userId: String(user.id) }
+      }
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('[stripe] Checkout session error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/stripe/portal — customer billing portal (manage/cancel subscription)
+app.post('/api/stripe/portal', authMiddleware, async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured.' });
+
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
+  if (!user.stripe_customer_id) return res.status(400).json({ error: 'No subscription found for this account.' });
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: user.stripe_customer_id,
+      return_url: process.env.APP_URL || 'http://localhost:3000'
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('[stripe] Portal error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Chat endpoint with streaming

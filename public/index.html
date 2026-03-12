@@ -140,25 +140,35 @@
   </div>
 </div>
 
-<!-- ═══ TRIAL EXPIRED MODAL ═══ -->
+<!-- ═══ UPGRADE MODAL ═══ -->
 <div id="trial-modal">
   <div class="trial-modal-card">
-    <div style="font-size:2.5rem;margin-bottom:12px;">⏳</div>
-    <h2 style="color:var(--green);font-family:'Amiri',serif;font-size:1.6rem;margin-bottom:8px;">Your Free Trial Has Ended</h2>
-    <p style="color:#718096;font-size:.9rem;margin-bottom:20px;">Thank you for trying Halal Advisor! To continue accessing your personal halal financial dashboard, please subscribe.</p>
+    <div style="font-size:2.5rem;margin-bottom:10px;">☽</div>
+    <h2 style="color:var(--green);font-family:'Amiri',serif;font-size:1.6rem;margin-bottom:6px;">Upgrade to Halal Advisor Pro</h2>
+    <p id="trial-modal-subtitle" style="color:#718096;font-size:.88rem;margin-bottom:20px;">Your free trial has ended. Continue with full access.</p>
+
+    <!-- Pricing -->
+    <div style="background:var(--green);border-radius:12px;padding:20px;margin-bottom:20px;color:white;text-align:center;">
+      <p style="font-size:.8rem;opacity:.8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Monthly Plan</p>
+      <p style="font-size:2.4rem;font-weight:800;line-height:1;">£4.99</p>
+      <p style="font-size:.82rem;opacity:.8;">per month · cancel anytime</p>
+    </div>
+
+    <!-- Features -->
     <div style="background:var(--green-pale);border-radius:10px;padding:16px;margin-bottom:20px;text-align:left;">
-      <p style="font-weight:700;color:var(--green);margin-bottom:8px;">What's included:</p>
-      <ul style="color:#4a5568;font-size:.85rem;list-style:none;padding:0;display:flex;flex-direction:column;gap:5px;">
-        <li>✓ AI advisor Amin — unlimited questions</li>
-        <li>✓ Budget tracker with halal/haram flagging</li>
-        <li>✓ Zakat calculator for all 4 madhabs</li>
-        <li>✓ Investment screener (Sharia compliance)</li>
-        <li>✓ Debt tracker with riba alerts</li>
-        <li>✓ Your private data securely stored</li>
+      <ul style="color:#4a5568;font-size:.85rem;list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;">
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> AI advisor Amin — unlimited questions</li>
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> Budget tracker with halal/haram flagging</li>
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> Zakat calculator for all 4 madhabs</li>
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> Investment screener — Sharia compliance</li>
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> Debt tracker with riba alerts</li>
+        <li style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);font-weight:700;">✓</span> Private data synced securely</li>
       </ul>
     </div>
-    <a href="mailto:support@halaladvisor.app?subject=Subscription" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:12px;margin-bottom:10px;">Contact Us to Subscribe</a>
-    <button onclick="document.getElementById('trial-modal').style.display='none'" style="background:none;border:none;color:#a0aec0;font-size:.82rem;cursor:pointer;width:100%;">Continue browsing (limited)</button>
+
+    <button id="subscribe-btn" onclick="handleSubscribeClick()" class="btn-primary" style="width:100%;padding:14px;font-size:1rem;margin-bottom:10px;">Subscribe — £4.99/month</button>
+    <p style="font-size:.72rem;color:#a0aec0;margin-bottom:12px;">Secure payment via Stripe · Cancel anytime in your account</p>
+    <button onclick="document.getElementById('trial-modal').style.display='none'" style="background:none;border:none;color:#a0aec0;font-size:.8rem;cursor:pointer;width:100%;text-decoration:underline;">Maybe later</button>
   </div>
 </div>
 
@@ -583,6 +593,12 @@
             </div>
             <button class="btn-primary" onclick="saveSettings()">Save All Settings</button>
             <div id="settings-saved" class="hidden" style="background:#d1fae5;color:#065f46;border-radius:8px;padding:10px;text-align:center;font-size:.85rem;font-weight:600;">✓ Settings saved!</div>
+            <div id="subscription-section" style="margin-top:8px;padding-top:16px;border-top:1px solid #e2e8f0;">
+              <p style="font-size:.82rem;font-weight:600;color:#4a5568;margin-bottom:8px;">Subscription</p>
+              <div id="subscription-status-display" style="font-size:.82rem;color:#718096;margin-bottom:8px;"></div>
+              <button id="manage-sub-btn" onclick="openPortal()" class="btn-outline" style="width:100%;font-size:.85rem;display:none;">Manage Subscription</button>
+              <button id="upgrade-settings-btn" onclick="showTrialModal()" class="btn-primary" style="width:100%;font-size:.85rem;display:none;">Upgrade — £4.99/month</button>
+            </div>
           </div>
         </div>
       </div>
@@ -809,11 +825,20 @@ async function doSignup() {
   } finally { btn.disabled = false; btn.textContent = 'Start 14-Day Free Trial'; }
 }
 
-async function afterAuth() {
+async function afterAuth(showSuccessBanner) {
   await loadUserDataFromServer();
   document.getElementById('auth-overlay').style.display = 'none';
   updateTrialBanner();
   renderAll();
+  if (showSuccessBanner) {
+    const toast = document.createElement('div');
+    toast.textContent = '🎉 Payment successful! Welcome to Halal Advisor Pro.';
+    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1a5c38;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:.9rem;z-index:9997;box-shadow:0 4px 20px rgba(0,0,0,.2);';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+    // Clean URL
+    history.replaceState({}, '', '/');
+  }
 }
 
 function logout() {
@@ -859,38 +884,101 @@ function updateTrialBanner() {
   const emailEl = document.getElementById('sidebar-user-email');
   if (emailEl) emailEl.textContent = currentUser.email;
   const days = currentUser.trialDaysLeft;
-  if (days > 7) {
+  const isPro = currentUser.subscriptionStatus === 'active';
+
+  if (isPro) {
+    banner.className = 'trial-banner trial-ok';
+    banner.textContent = '✓ Pro';
+    banner.style.cursor = 'default';
+  } else if (days > 7) {
     banner.className = 'trial-banner trial-ok';
     banner.textContent = `Free trial: ${days} days left`;
   } else if (days > 0) {
     banner.className = 'trial-banner trial-warn';
-    banner.textContent = `⚠️ Trial expires in ${days} day${days === 1 ? '' : 's'}`;
+    banner.textContent = `⚠️ Trial: ${days} day${days === 1 ? '' : 's'} left`;
   } else {
     banner.className = 'trial-banner trial-expired';
     banner.textContent = 'Trial expired — upgrade';
     showTrialModal();
   }
   banner.style.display = 'block';
+
+  // Update settings section
+  const statusDisplay = document.getElementById('subscription-status-display');
+  const manageBtn = document.getElementById('manage-sub-btn');
+  const upgradeBtn = document.getElementById('upgrade-settings-btn');
+  if (statusDisplay) {
+    if (isPro) {
+      statusDisplay.innerHTML = '<span style="color:#2e8b57;font-weight:600;">✓ Pro — active</span>';
+      if (manageBtn) manageBtn.style.display = 'block';
+      if (upgradeBtn) upgradeBtn.style.display = 'none';
+    } else if (days > 0) {
+      statusDisplay.textContent = `Free trial — ${days} day${days === 1 ? '' : 's'} remaining`;
+      if (manageBtn) manageBtn.style.display = 'none';
+      if (upgradeBtn) upgradeBtn.style.display = 'block';
+    } else {
+      statusDisplay.innerHTML = '<span style="color:#e53e3e;">Trial expired</span>';
+      if (manageBtn) manageBtn.style.display = 'none';
+      if (upgradeBtn) upgradeBtn.style.display = 'block';
+    }
+  }
 }
 
 function showTrialModal() {
+  const subtitle = document.getElementById('trial-modal-subtitle');
+  const days = currentUser?.trialDaysLeft ?? 0;
+  if (subtitle) {
+    subtitle.textContent = days > 0
+      ? `Your trial ends in ${days} day${days === 1 ? '' : 's'}. Lock in Pro access now.`
+      : 'Your free trial has ended. Continue with full access.';
+  }
   document.getElementById('trial-modal').style.display = 'flex';
 }
 
+async function handleSubscribeClick() {
+  const btn = document.getElementById('subscribe-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout...';
+  try {
+    const res = await fetch('/api/stripe/create-checkout-session', { method: 'POST', headers: getHeaders() });
+    const d = await res.json();
+    if (!res.ok) { alert(d.error); return; }
+    window.location.href = d.url;
+  } catch(e) {
+    alert('Could not start checkout. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Subscribe — £4.99/month';
+  }
+}
+
+async function openPortal() {
+  const btn = document.getElementById('manage-sub-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Opening...'; }
+  try {
+    const res = await fetch('/api/stripe/portal', { method: 'POST', headers: getHeaders() });
+    const d = await res.json();
+    if (!res.ok) { alert(d.error); return; }
+    window.location.href = d.url;
+  } catch(e) {
+    alert('Could not open billing portal. Please try again.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Manage Subscription'; }
+  }
+}
+
 async function initApp() {
+  const subscribed = new URLSearchParams(window.location.search).get('subscribed') === '1';
   if (authToken) {
     try {
       const res = await fetch('/api/user/me', { headers: getHeaders() });
       if (res.ok) {
         currentUser = await res.json();
-        await loadUserDataFromServer();
-        document.getElementById('auth-overlay').style.display = 'none';
-        updateTrialBanner();
-        renderAll();
+        await afterAuth(subscribed);
         return;
       }
     } catch {}
-    // Token invalid or server unreachable
+    // Token invalid or expired
     localStorage.removeItem('halalAuthToken');
     authToken = null;
   }
