@@ -4,6 +4,11 @@ node_modules/
 # Environment variables — NEVER commit your API key
 .env
 
+# SQLite database — contains user data
+*.db
+*.db-shm
+*.db-wal
+
 # Logs
 npm-debug.log*
 *.log

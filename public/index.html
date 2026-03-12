@@ -85,9 +85,82 @@
     .madhab-banner.hanafi  { background: #eff6ff; border-left: 4px solid #3b82f6; }
     .madhab-banner.maliki  { background: #fff7ed; border-left: 4px solid #f97316; }
     .madhab-banner.hanbali { background: #fdf4ff; border-left: 4px solid #a855f7; }
+
+    /* Auth overlay */
+    #auth-overlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--green) 0%,var(--green-mid) 50%,#1a3a2e 100%); }
+    .auth-card { background:white; border-radius:16px; padding:40px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .auth-tab { flex:1; padding:10px; border:none; background:none; cursor:pointer; font-weight:600; font-size:.9rem; color:#a0aec0; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .2s; }
+    .auth-tab.active { color:var(--green); border-bottom-color:var(--green); font-weight:700; }
+
+    /* Trial banner */
+    .trial-banner { display:none; padding:5px 14px; border-radius:20px; font-size:.72rem; font-weight:700; text-align:center; cursor:default; }
+    .trial-ok   { background:rgba(255,255,255,.15); color:rgba(255,255,255,.8); }
+    .trial-warn { background:#fef3c7; color:#92400e; }
+    .trial-expired { background:#fee2e2; color:#991b1b; cursor:pointer; }
+
+    /* Trial expired modal */
+    #trial-modal { position:fixed; inset:0; z-index:9998; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.6); }
+    .trial-modal-card { background:white; border-radius:16px; padding:40px; max-width:440px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3); }
   </style>
 </head>
 <body>
+
+<!-- ═══ AUTH OVERLAY ═══ -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div style="text-align:center;margin-bottom:28px;">
+      <h1 style="font-family:'Amiri',serif;color:var(--green);font-size:2rem;">☽ Halal Advisor</h1>
+      <p style="color:#718096;font-size:.85rem;margin-top:6px;">Islamic Financial Guidance · GBP · All 4 Madhabs</p>
+    </div>
+    <div style="display:flex;border-bottom:2px solid #e2e8f0;margin-bottom:24px;">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <!-- Sign In -->
+    <div id="form-signin">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div><label class="label">Email</label><input class="input" id="si-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
+        <div><label class="label">Password</label><input class="input" id="si-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/></div>
+        <p id="si-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
+        <button class="btn-primary" id="si-btn" onclick="doLogin()" style="width:100%;padding:12px;font-size:1rem;">Sign In</button>
+        <p style="text-align:center;font-size:.8rem;color:#a0aec0;">Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:var(--green);font-weight:600;">Create one free</a></p>
+      </div>
+    </div>
+    <!-- Sign Up -->
+    <div id="form-signup" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div><label class="label">Email</label><input class="input" id="su-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
+        <div><label class="label">Password <span style="font-weight:400;color:#a0aec0;">(min 8 characters)</span></label><input class="input" id="su-password" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
+        <div><label class="label">Confirm Password</label><input class="input" id="su-confirm" type="password" placeholder="••••••••" autocomplete="new-password" onkeypress="if(event.key==='Enter')doSignup()"/></div>
+        <p id="su-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
+        <button class="btn-primary" id="su-btn" onclick="doSignup()" style="width:100%;padding:12px;font-size:1rem;">Start 14-Day Free Trial</button>
+        <p style="font-size:.75rem;color:#a0aec0;text-align:center;">Free for 14 days. No credit card required.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRIAL EXPIRED MODAL ═══ -->
+<div id="trial-modal">
+  <div class="trial-modal-card">
+    <div style="font-size:2.5rem;margin-bottom:12px;">⏳</div>
+    <h2 style="color:var(--green);font-family:'Amiri',serif;font-size:1.6rem;margin-bottom:8px;">Your Free Trial Has Ended</h2>
+    <p style="color:#718096;font-size:.9rem;margin-bottom:20px;">Thank you for trying Halal Advisor! To continue accessing your personal halal financial dashboard, please subscribe.</p>
+    <div style="background:var(--green-pale);border-radius:10px;padding:16px;margin-bottom:20px;text-align:left;">
+      <p style="font-weight:700;color:var(--green);margin-bottom:8px;">What's included:</p>
+      <ul style="color:#4a5568;font-size:.85rem;list-style:none;padding:0;display:flex;flex-direction:column;gap:5px;">
+        <li>✓ AI advisor Amin — unlimited questions</li>
+        <li>✓ Budget tracker with halal/haram flagging</li>
+        <li>✓ Zakat calculator for all 4 madhabs</li>
+        <li>✓ Investment screener (Sharia compliance)</li>
+        <li>✓ Debt tracker with riba alerts</li>
+        <li>✓ Your private data securely stored</li>
+      </ul>
+    </div>
+    <a href="mailto:support@halaladvisor.app?subject=Subscription" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:12px;margin-bottom:10px;">Contact Us to Subscribe</a>
+    <button onclick="document.getElementById('trial-modal').style.display='none'" style="background:none;border:none;color:#a0aec0;font-size:.82rem;cursor:pointer;width:100%;">Continue browsing (limited)</button>
+  </div>
+</div>
 
 <!-- Sidebar -->
 <div id="sidebar">
@@ -125,8 +198,11 @@
       Settings
     </div>
   </nav>
-  <div style="padding:16px 20px; border-top:1px solid rgba(255,255,255,0.1);">
-    <p style="color:rgba(255,255,255,0.35); font-size:0.68rem;">Guidance only. Consult a scholar for fatwas.</p>
+  <div style="padding:12px 16px; border-top:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:8px;">
+    <div id="trial-banner" class="trial-banner" onclick="showTrialModal()"></div>
+    <div id="sidebar-user-email" style="color:rgba(255,255,255,0.5);font-size:.68rem;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+    <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:6px;padding:6px;font-size:.75rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">Sign Out</button>
+    <p style="color:rgba(255,255,255,0.25); font-size:0.65rem; text-align:center; margin:0;">Guidance only. Consult a scholar for fatwas.</p>
   </div>
 </div>
 
@@ -665,15 +741,160 @@ let data = {
 
 const HARAM_CATS = ['interest_income'];
 
-function loadData() {
-  const saved = localStorage.getItem('halalAdvisorData_v3');
-  if (saved) {
-    try { const p = JSON.parse(saved); data = { ...data, ...p }; } catch(e) {}
+// ─────────────────────────────────────────────
+// AUTH & DATA SYNC
+// ─────────────────────────────────────────────
+
+let authToken = localStorage.getItem('halalAuthToken');
+let currentUser = null;
+
+function getHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (authToken) h['Authorization'] = 'Bearer ' + authToken;
+  return h;
+}
+
+function switchTab(tab) {
+  const isSignin = tab === 'signin';
+  document.getElementById('form-signin').style.display = isSignin ? '' : 'none';
+  document.getElementById('form-signup').style.display = isSignin ? 'none' : '';
+  document.getElementById('tab-signin').classList.toggle('active', isSignin);
+  document.getElementById('tab-signup').classList.toggle('active', !isSignin);
+}
+
+async function doLogin() {
+  const email = document.getElementById('si-email').value.trim();
+  const password = document.getElementById('si-password').value;
+  const errEl = document.getElementById('si-error');
+  const btn = document.getElementById('si-btn');
+  errEl.style.display = 'none';
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  try {
+    const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const d = await res.json();
+    if (!res.ok) { errEl.textContent = d.error; errEl.style.display = 'block'; return; }
+    authToken = d.token;
+    localStorage.setItem('halalAuthToken', authToken);
+    currentUser = { email: d.email, trialDaysLeft: d.trialDaysLeft };
+    await afterAuth();
+  } catch(e) {
+    errEl.textContent = 'Could not connect to server. Please try again.';
+    errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
+}
+
+async function doSignup() {
+  const email = document.getElementById('su-email').value.trim();
+  const password = document.getElementById('su-password').value;
+  const confirm = document.getElementById('su-confirm').value;
+  const errEl = document.getElementById('su-error');
+  const btn = document.getElementById('su-btn');
+  errEl.style.display = 'none';
+  if (!email || !password || !confirm) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  if (password !== confirm) { errEl.textContent = "Passwords don't match."; errEl.style.display = 'block'; return; }
+  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  try {
+    const res = await fetch('/api/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const d = await res.json();
+    if (!res.ok) { errEl.textContent = d.error; errEl.style.display = 'block'; return; }
+    authToken = d.token;
+    localStorage.setItem('halalAuthToken', authToken);
+    currentUser = { email: d.email, trialDaysLeft: d.trialDaysLeft };
+    await afterAuth();
+  } catch(e) {
+    errEl.textContent = 'Could not connect to server. Please try again.';
+    errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Start 14-Day Free Trial'; }
+}
+
+async function afterAuth() {
+  await loadUserDataFromServer();
+  document.getElementById('auth-overlay').style.display = 'none';
+  updateTrialBanner();
+  renderAll();
+}
+
+function logout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('halalAuthToken');
+  data = { transactions: [], debts: [], screenings: [], chatHistory: [], settings: { name: 'Brother/Sister', madhab: 'shafii', goldPriceGBP: 75, silverPriceGBP: 0.72 } };
+  document.getElementById('trial-banner').style.display = 'none';
+  document.getElementById('sidebar-user-email').textContent = '';
+  document.getElementById('auth-overlay').style.display = 'flex';
+}
+
+async function loadUserDataFromServer() {
+  try {
+    const res = await fetch('/api/user/data', { headers: getHeaders() });
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.transactions) data.transactions = d.transactions;
+    if (d.debts) data.debts = d.debts;
+    if (d.screenings) data.screenings = d.screenings;
+    if (d.chatHistory) data.chatHistory = d.chatHistory;
+    if (d.settings) data.settings = { ...data.settings, ...d.settings };
+  } catch(e) {
+    console.warn('Could not load user data from server:', e.message);
   }
 }
 
 function saveData() {
+  // Save to localStorage as a local cache
   localStorage.setItem('halalAdvisorData_v3', JSON.stringify(data));
+  // Sync to server (fire-and-forget)
+  if (!authToken) return;
+  const keys = ['transactions', 'debts', 'screenings', 'settings'];
+  for (const key of keys) {
+    fetch('/api/user/data', { method: 'PUT', headers: getHeaders(), body: JSON.stringify({ key, value: data[key] }) })
+      .catch(() => {});
+  }
+}
+
+function updateTrialBanner() {
+  if (!currentUser) return;
+  const banner = document.getElementById('trial-banner');
+  const emailEl = document.getElementById('sidebar-user-email');
+  if (emailEl) emailEl.textContent = currentUser.email;
+  const days = currentUser.trialDaysLeft;
+  if (days > 7) {
+    banner.className = 'trial-banner trial-ok';
+    banner.textContent = `Free trial: ${days} days left`;
+  } else if (days > 0) {
+    banner.className = 'trial-banner trial-warn';
+    banner.textContent = `⚠️ Trial expires in ${days} day${days === 1 ? '' : 's'}`;
+  } else {
+    banner.className = 'trial-banner trial-expired';
+    banner.textContent = 'Trial expired — upgrade';
+    showTrialModal();
+  }
+  banner.style.display = 'block';
+}
+
+function showTrialModal() {
+  document.getElementById('trial-modal').style.display = 'flex';
+}
+
+async function initApp() {
+  if (authToken) {
+    try {
+      const res = await fetch('/api/user/me', { headers: getHeaders() });
+      if (res.ok) {
+        currentUser = await res.json();
+        await loadUserDataFromServer();
+        document.getElementById('auth-overlay').style.display = 'none';
+        updateTrialBanner();
+        renderAll();
+        return;
+      }
+    } catch {}
+    // Token invalid or server unreachable
+    localStorage.removeItem('halalAuthToken');
+    authToken = null;
+  }
+  document.getElementById('auth-overlay').style.display = 'flex';
 }
 
 function getMadhab() {
@@ -702,6 +923,7 @@ function showSection(name, el) {
 
 function selectMadhab(m) {
   data.settings.madhab = m;
+  saveData();
   updateMadhabUI();
 }
 
@@ -1004,7 +1226,7 @@ async function screenInvestment() {
   result.innerHTML = '<p style="color:#718096;font-size:.85rem;text-align:center;padding:16px;">Consulting Islamic finance principles...</p>';
   try {
     const res = await fetch('/api/screen', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: getHeaders(),
       body: JSON.stringify({ company, madhab: getMadhab() })
     });
     if (!res.ok) throw new Error(await res.text());
@@ -1080,7 +1302,7 @@ async function sendChat() {
   const btn = document.getElementById('send-btn'); btn.disabled = true;
   try {
     const res = await fetch('/api/chat', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: getHeaders(),
       body: JSON.stringify({ messages: data.chatHistory, madhab: getMadhab() })
     });
     if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -1192,8 +1414,7 @@ function renderAll() {
 }
 
 // Init
-loadData();
-renderAll();
+initApp();
 </script>
 </body>
 </html>

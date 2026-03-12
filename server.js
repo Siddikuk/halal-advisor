@@ -2,10 +2,114 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
+const Database = require('better-sqlite3');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ─────────────────────────────────────────────
+// DATABASE & AUTH
+// ─────────────────────────────────────────────
+
+const db = new Database(path.join(__dirname, 'halal_advisor.db'));
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    email        TEXT    UNIQUE NOT NULL COLLATE NOCASE,
+    password_hash TEXT   NOT NULL,
+    trial_start  INTEGER NOT NULL,
+    created_at   INTEGER NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS user_data (
+    user_id    INTEGER NOT NULL,
+    data_key   TEXT    NOT NULL,
+    data_value TEXT    NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (user_id, data_key),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+`);
+
+const JWT_SECRET = process.env.JWT_SECRET || 'halal-advisor-dev-secret-change-in-production';
+const TRIAL_DAYS = 14;
+
+function trialDaysLeft(trialStart) {
+  return Math.max(0, TRIAL_DAYS - Math.floor((Date.now() - trialStart) / 86400000));
+}
+
+function authMiddleware(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: 'Authentication required. Please log in.' });
+  try {
+    req.user = jwt.verify(auth.slice(7), JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Session expired. Please log in again.' });
+  }
+}
+
+// POST /api/auth/signup
+app.post('/api/auth/signup', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Invalid email address.' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  try {
+    const hash = await bcrypt.hash(password, 12);
+    const now = Date.now();
+    const result = db.prepare(
+      'INSERT INTO users (email, password_hash, trial_start, created_at) VALUES (?, ?, ?, ?)'
+    ).run(email.toLowerCase(), hash, now, now);
+    const token = jwt.sign({ userId: result.lastInsertRowid, email: email.toLowerCase() }, JWT_SECRET, { expiresIn: '30d' });
+    res.json({ token, email: email.toLowerCase(), trialDaysLeft: TRIAL_DAYS });
+  } catch (err) {
+    if (err.message.includes('UNIQUE constraint')) return res.status(409).json({ error: 'This email is already registered. Please sign in.' });
+    console.error('[signup]', err.message);
+    res.status(500).json({ error: 'Registration failed. Please try again.' });
+  }
+});
+
+// POST /api/auth/login
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+  if (!user) return res.status(401).json({ error: 'Invalid email or password.' });
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid) return res.status(401).json({ error: 'Invalid email or password.' });
+  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
+  res.json({ token, email: user.email, trialDaysLeft: trialDaysLeft(user.trial_start) });
+});
+
+// GET /api/user/me
+app.get('/api/user/me', authMiddleware, (req, res) => {
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  res.json({ email: user.email, trialDaysLeft: trialDaysLeft(user.trial_start) });
+});
+
+// GET /api/user/data — load all user data keys
+app.get('/api/user/data', authMiddleware, (req, res) => {
+  const rows = db.prepare('SELECT data_key, data_value FROM user_data WHERE user_id = ?').all(req.user.userId);
+  const result = {};
+  for (const row of rows) {
+    try { result[row.data_key] = JSON.parse(row.data_value); } catch { result[row.data_key] = row.data_value; }
+  }
+  res.json(result);
+});
+
+// PUT /api/user/data — save one data key
+app.put('/api/user/data', authMiddleware, (req, res) => {
+  const { key, value } = req.body;
+  if (!key) return res.status(400).json({ error: 'Data key required.' });
+  db.prepare(
+    'INSERT OR REPLACE INTO user_data (user_id, data_key, data_value, updated_at) VALUES (?, ?, ?, ?)'
+  ).run(req.user.userId, key, JSON.stringify(value), Date.now());
+  res.json({ ok: true });
+});
 
 // ─────────────────────────────────────────────
 // MADHAB-SPECIFIC SYSTEM PROMPTS
@@ -175,7 +279,7 @@ const client = new Anthropic({
 });
 
 // Chat endpoint with streaming
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', authMiddleware, async (req, res) => {
   const { messages, madhab } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
@@ -228,7 +332,7 @@ function extractJSON(text) {
 const SCREEN_SYSTEM = `You are a Sharia compliance analyst. You respond ONLY with a raw JSON object — no markdown, no code fences, no explanation text before or after. Just the JSON.`;
 
 // Investment screening endpoint
-app.post('/api/screen', async (req, res) => {
+app.post('/api/screen', authMiddleware, async (req, res) => {
   const { company, madhab } = req.body;
 
   if (!company) return res.status(400).json({ error: 'Company name required' });
