@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit your API key
+.env
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

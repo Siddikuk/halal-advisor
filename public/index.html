@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Halal Financial Advisor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green: #1a5c38; --green-mid: #246b44; --green-light: #2e8b57;
+      --green-pale: #e8f5ee; --gold: #c9a227; --gold-light: #f0d060; --cream: #faf8f3;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--cream); color: #1a1a2e; }
+    #sidebar { width: 240px; min-height: 100vh; background: var(--green); position: fixed; left: 0; top: 0; z-index: 100; display: flex; flex-direction: column; }
+    .sidebar-logo { padding: 24px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-logo h1 { font-family: 'Amiri', serif; color: var(--gold-light); font-size: 1.3rem; line-height: 1.3; }
+    .sidebar-madhab { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; color: rgba(255,255,255,0.75); cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; font-size: 0.9rem; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .nav-item.active { background: rgba(255,255,255,0.12); color: white; border-left-color: var(--gold); }
+    .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    #main { margin-left: 240px; padding: 32px; min-height: 100vh; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04); padding: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-left: 4px solid var(--green-light); }
+    .stat-card.gold { border-left-color: var(--gold); }
+    .stat-card.red { border-left-color: #e53e3e; }
+    .stat-card.blue { border-left-color: #3182ce; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; padding: 2px 10px; }
+    .badge-halal { background: #d1fae5; color: #065f46; }
+    .badge-haram { background: #fee2e2; color: #991b1b; }
+    .badge-doubtful { background: #fef3c7; color: #92400e; }
+    .badge-unknown { background: #f3f4f6; color: #4b5563; }
+    .btn-primary { background: var(--green); color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--green-mid); }
+    .btn-outline { background: transparent; color: var(--green); border: 2px solid var(--green); border-radius: 8px; padding: 9px 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--green-pale); }
+    .btn-danger { background: #e53e3e; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; }
+    .input { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; background: white; }
+    .input:focus { border-color: var(--green-light); }
+    .label { display: block; font-size: 0.82rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+    #chatMessages { height: 440px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .msg-user { align-self: flex-end; background: var(--green); color: white; padding: 10px 14px; border-radius: 14px 14px 2px 14px; max-width: 75%; font-size: 0.88rem; }
+    .msg-ai { align-self: flex-start; background: white; border: 1.5px solid #e2e8f0; padding: 12px 14px; border-radius: 14px 14px 14px 2px; max-width: 80%; font-size: 0.88rem; line-height: 1.6; }
+    .msg-ai strong { color: var(--green); }
+    .typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,80%,100%{transform:scale(0.6);opacity:.5}40%{transform:scale(1);opacity:1} }
+    .section-title { font-size: 1.5rem; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+    .section-sub { font-size: 0.88rem; color: #718096; margin-bottom: 24px; }
+    .txn-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .txn-row:last-child { border-bottom: none; }
+    .zakat-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+    .zakat-fill { height: 100%; background: var(--green-light); border-radius: 5px; transition: width 0.5s; }
+    .page-header { background: linear-gradient(135deg, var(--green) 0%, var(--green-mid) 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px; color: white; }
+    .verdict-halal { background: #d1fae5; border: 2px solid #34d399; border-radius: 12px; padding: 16px; }
+    .verdict-haram { background: #fee2e2; border: 2px solid #f87171; border-radius: 12px; padding: 16px; }
+    .verdict-doubtful { background: #fef3c7; border: 2px solid #fbbf24; border-radius: 12px; padding: 16px; }
+    .verdict-unknown { background: #f3f4f6; border: 2px solid #9ca3af; border-radius: 12px; padding: 16px; }
+    .hidden { display: none !important; }
+    .nisab-above { background: #d1fae5; border: 1px solid #34d399; border-radius: 8px; padding: 12px 16px; color: #065f46; }
+    .nisab-below { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px 16px; color: #374151; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f0f0f0; }
+    ::-webkit-scrollbar-thumb { background: var(--green-light); border-radius: 5px; }
+
+    /* Madhab selector cards */
+    .madhab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .madhab-card { position: relative; border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; background: white; }
+    .madhab-card:hover { border-color: var(--green-light); background: var(--green-pale); }
+    .madhab-card.selected { border-color: var(--green); background: var(--green-pale); }
+    .madhab-card input[type=radio] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .madhab-card-name { font-weight: 700; font-size: 0.95rem; color: var(--green); }
+    .madhab-card-arabic { font-family: 'Amiri', serif; font-size: 1rem; color: #718096; }
+    .madhab-card-key { font-size: 0.72rem; color: #718096; margin-top: 4px; line-height: 1.4; }
+    .madhab-card.selected .madhab-card-key { color: var(--green); }
+    .madhab-check { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; }
+    .madhab-card.selected .madhab-check { background: var(--green); border-color: var(--green); color: white; }
+
+    /* Madhab info banner */
+    .madhab-banner { border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 0.85rem; }
+    .madhab-banner.shafii  { background: #e8f5ee; border-left: 4px solid var(--green); }
+    .madhab-banner.hanafi  { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .madhab-banner.maliki  { background: #fff7ed; border-left: 4px solid #f97316; }
+    .madhab-banner.hanbali { background: #fdf4ff; border-left: 4px solid #a855f7; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <h1>☽ Halal Advisor</h1>
+    <div id="sidebar-madhab-display" class="sidebar-madhab">Shafi'i Madhab · GBP</div>
+  </div>
+  <nav style="padding:12px 0; flex:1;">
+    <div class="nav-item active" onclick="showSection('dashboard',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('budget',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      Budget Tracker
+    </div>
+    <div class="nav-item" onclick="showSection('zakat',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Zakat Calculator
+    </div>
+    <div class="nav-item" onclick="showSection('investments',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      Investment Screener
+    </div>
+    <div class="nav-item" onclick="showSection('chat',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      AI Advisor (Amin)
+    </div>
+    <div class="nav-item" onclick="showSection('debts',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+      Debt Tracker
+    </div>
+    <div class="nav-item" onclick="showSection('settings',this)">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+      Settings
+    </div>
+  </nav>
+  <div style="padding:16px 20px; border-top:1px solid rgba(255,255,255,0.1);">
+    <p style="color:rgba(255,255,255,0.35); font-size:0.68rem;">Guidance only. Consult a scholar for fatwas.</p>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <section id="sec-dashboard">
+    <div class="page-header">
+      <h2 style="font-size:1.6rem;font-weight:700;">Assalamu Alaikum, <span id="welcomeName">Brother/Sister</span> ☽</h2>
+      <p style="opacity:.85;margin-top:4px;font-size:.92rem;">Madhab: <span id="header-madhab-name" style="font-weight:700;color:var(--gold-light);">Shafi'i</span> · GBP · All calculations follow your madhab's rulings</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Total Assets</p>
+        <p id="dash-assets" style="font-size:1.8rem;font-weight:700;color:var(--green);margin-top:4px;">£0</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Halal wealth</p>
+      </div>
+      <div class="stat-card gold">
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">This Month: Income</p>
+        <p id="dash-income" style="font-size:1.8rem;font-weight:700;color:var(--gold);margin-top:4px;">£0</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Halal earnings</p>
+      </div>
+      <div class="stat-card red">
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">This Month: Expenses</p>
+        <p id="dash-expenses" style="font-size:1.8rem;font-weight:700;color:#e53e3e;margin-top:4px;">£0</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Total spending</p>
+      </div>
+      <div class="stat-card blue">
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Zakat Status</p>
+        <p id="dash-zakat" style="font-size:1.1rem;font-weight:700;color:#3182ce;margin-top:6px;">Calculate →</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;"><span id="dash-madhab-nisab">Nisab</span></p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span style="background:var(--green-pale);color:var(--green);padding:4px 8px;border-radius:6px;font-size:.78rem;">QUICK ADD</span>Log Transaction
+        </h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div><label class="label">Description</label><input class="input" id="quick-desc" placeholder="e.g. Salary, Groceries..."/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div><label class="label">Amount (£)</label><input class="input" id="quick-amount" type="number" placeholder="0.00"/></div>
+            <div><label class="label">Type</label>
+              <select class="input" id="quick-type">
+                <option value="income">Income ↑</option>
+                <option value="expense">Expense ↓</option>
+              </select>
+            </div>
+          </div>
+          <div><label class="label">Category</label>
+            <select class="input" id="quick-cat">
+              <optgroup label="✅ Halal Income">
+                <option value="salary">Salary / Wages</option>
+                <option value="freelance">Freelance / Business</option>
+                <option value="rental">Rental Income</option>
+                <option value="investment">Halal Investment Return</option>
+                <option value="gift">Gift / Inheritance</option>
+              </optgroup>
+              <optgroup label="✅ Halal Expenses">
+                <option value="food">Food & Groceries</option>
+                <option value="housing">Housing / Rent</option>
+                <option value="transport">Transport</option>
+                <option value="utilities">Utilities</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="education">Education</option>
+                <option value="clothing">Clothing</option>
+                <option value="charity">Sadaqah / Zakat</option>
+                <option value="savings">Savings</option>
+              </optgroup>
+              <optgroup label="⚠️ Review Required">
+                <option value="interest_income">⚠️ Interest Income (HARAM)</option>
+                <option value="insurance">Insurance Payment</option>
+                <option value="other">Other</option>
+              </optgroup>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="quickAddTransaction()">Add Transaction</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;">Recent Transactions</h3>
+        <div id="recent-txns" style="max-height:280px;overflow-y:auto;">
+          <p style="color:#a0aec0;font-size:.85rem;text-align:center;margin-top:40px;">No transactions yet.</p>
+        </div>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:12px;padding:16px 20px;border-left:4px solid var(--gold);">
+      <p style="font-family:'Amiri',serif;font-size:1rem;color:#78350f;">"وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ" — And establish prayer and give zakat. (Quran 2:110)</p>
+      <p style="font-size:.78rem;color:#92400e;margin-top:4px;">Wealth purified through zakat is blessed. Consult a scholar for personal fatwas.</p>
+    </div>
+  </section>
+
+  <!-- ═══ BUDGET ═══ -->
+  <section id="sec-budget" class="hidden">
+    <div class="section-title">Budget Tracker</div>
+    <p class="section-sub">Track halal income and expenses. Haram items are automatically flagged.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+      <div class="stat-card"><p style="font-size:.78rem;color:#718096;font-weight:600;">TOTAL INCOME</p><p id="budget-total-income" style="font-size:1.6rem;font-weight:700;color:var(--green);margin-top:4px;">£0.00</p></div>
+      <div class="stat-card red"><p style="font-size:.78rem;color:#718096;font-weight:600;">TOTAL EXPENSES</p><p id="budget-total-expense" style="font-size:1.6rem;font-weight:700;color:#e53e3e;margin-top:4px;">£0.00</p></div>
+      <div class="stat-card blue"><p style="font-size:.78rem;color:#718096;font-weight:600;">NET BALANCE</p><p id="budget-net" style="font-size:1.6rem;font-weight:700;color:#3182ce;margin-top:4px;">£0.00</p></div>
+    </div>
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button onclick="filterTxns('all')" id="filter-all" class="btn-primary" style="font-size:.82rem;padding:7px 14px;">All</button>
+        <button onclick="filterTxns('income')" id="filter-income" class="btn-outline" style="font-size:.82rem;padding:7px 14px;">Income</button>
+        <button onclick="filterTxns('expense')" id="filter-expense" class="btn-outline" style="font-size:.82rem;padding:7px 14px;">Expenses</button>
+        <button onclick="filterTxns('haram')" id="filter-haram" class="btn-outline" style="font-size:.82rem;padding:7px 14px;color:#e53e3e;border-color:#e53e3e;">⚠️ Flagged</button>
+        <div style="margin-left:auto;"><button onclick="clearAllTransactions()" style="background:none;border:none;color:#a0aec0;font-size:.8rem;cursor:pointer;">Clear All</button></div>
+      </div>
+    </div>
+    <div class="card"><div id="budget-txn-list"><p style="color:#a0aec0;text-align:center;padding:40px;font-size:.88rem;">No transactions. Add one from the Dashboard.</p></div></div>
+  </section>
+
+  <!-- ═══ ZAKAT ═══ -->
+  <section id="sec-zakat" class="hidden">
+    <div class="section-title">Zakat Calculator</div>
+    <p class="section-sub" id="zakat-sub-text">Calculating according to your selected madhab.</p>
+
+    <!-- Madhab banner -->
+    <div id="zakat-madhab-banner" class="madhab-banner shafii"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Your Zakatable Assets</h3>
+        <div style="background:var(--green-pale);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:var(--green);" id="nisab-info-box">
+          Nisab: £<span id="nisab-display">6,375</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><label class="label">💷 Cash & Halal Bank Savings (£)</label>
+            <input class="input" id="z-cash" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+            <p style="font-size:.75rem;color:#718096;margin-top:3px;">Islamic savings only. For interest accounts: enter principal only, plan to donate any interest received.</p>
+          </div>
+          <div><label class="label">📈 Halal Investments / Shares (£)</label>
+            <input class="input" id="z-invest" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+          </div>
+          <div><label class="label">🥇 Gold (grams)</label>
+            <input class="input" id="z-gold-grams" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+            <p id="gold-jewelry-note" style="font-size:.75rem;color:#718096;margin-top:3px;"></p>
+          </div>
+          <div><label class="label">⬜ Silver (grams)</label>
+            <input class="input" id="z-silver-grams" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+          </div>
+          <div><label class="label">🏭 Business Inventory / Trade Goods (£)</label>
+            <input class="input" id="z-business" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+          </div>
+          <div><label class="label">💰 Receivables / Money Owed to You (£)</label>
+            <input class="input" id="z-receivables" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+          </div>
+          <!-- Debt deduction — shown for Hanafi, Maliki, Hanbali -->
+          <div id="z-debt-section">
+            <label class="label">➖ Deductible Debts (£) <span id="debt-deduct-label" style="color:#718096;font-weight:400;font-size:.78rem;"></span></label>
+            <input class="input" id="z-debts" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
+            <p id="debt-deduct-note" style="font-size:.75rem;color:#718096;margin-top:3px;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Zakat Result</h3>
+          <div id="zakat-result-card" class="nisab-below"><p style="font-weight:600;font-size:1.1rem;">Enter your assets to calculate</p></div>
+          <div style="margin-top:20px;">
+            <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
+              <span style="color:#718096;">Gross Zakatable Wealth</span><span id="z-gross-display" style="font-weight:700;">£0</span>
+            </div>
+            <div id="z-debt-deduct-line" style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;" class="hidden">
+              <span style="color:#718096;">Less: Deductible Debts</span><span id="z-debt-deduct-val" style="font-weight:700;color:#e53e3e;">-£0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
+              <span style="color:#718096;">Net Zakatable Wealth</span><span id="z-total-display" style="font-weight:700;">£0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
+              <span style="color:#718096;" id="nisab-label-line">Nisab Threshold</span>
+              <span id="z-nisab-line" style="font-weight:700;color:var(--green);">£6,375</span>
+            </div>
+            <div class="zakat-bar" style="margin:12px 0;"><div class="zakat-fill" id="zakat-progress" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px;">
+              <span style="color:#718096;">Zakat Rate</span><span style="font-weight:700;">2.5%</span>
+            </div>
+            <div style="border-top:2px solid var(--green-pale);margin:12px 0;padding-top:12px;display:flex;justify-content:space-between;">
+              <span style="font-weight:700;font-size:1rem;">Zakat Due</span>
+              <span id="z-due-display" style="font-weight:800;font-size:1.3rem;color:var(--green);">£0.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-weight:700;margin-bottom:12px;">Zakat al-Fitr (Fitrana)</h3>
+          <p style="font-size:.85rem;color:#718096;margin-bottom:12px;">Obligatory charity before Eid al-Fitr prayer. ~£5–10 per person in UK.</p>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;"><label class="label">Household members</label><input class="input" id="z-fitrana-people" type="number" placeholder="1" min="1" value="1" oninput="calcFitrana()"/></div>
+            <div style="flex:1;"><label class="label">Per person (£)</label><input class="input" id="z-fitrana-amount" type="number" placeholder="7" value="7" oninput="calcFitrana()"/></div>
+          </div>
+          <div style="margin-top:12px;background:var(--green-pale);border-radius:8px;padding:12px;display:flex;justify-content:space-between;">
+            <span style="font-weight:600;color:var(--green);">Total Zakat al-Fitr</span>
+            <span id="z-fitrana-total" style="font-weight:800;color:var(--green);font-size:1.1rem;">£7.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INVESTMENTS ═══ -->
+  <section id="sec-investments" class="hidden">
+    <div class="section-title">Investment Screener</div>
+    <p class="section-sub">Check if a company or fund is Sharia-compliant. AI applies your <strong id="screen-madhab-label">Shafi'i</strong> madhab's rulings.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;">Screen an Investment</h3>
+        <div style="margin-bottom:12px;"><label class="label">Company / Fund / ETF Name</label>
+          <input class="input" id="screen-input" placeholder="e.g. Apple, Vanguard S&P 500, BP..."/>
+        </div>
+        <button class="btn-primary" onclick="screenInvestment()" id="screen-btn" style="width:100%;">Screen for Halal Compliance</button>
+        <div id="screen-result" style="margin-top:16px;"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;">Sharia Screening Criteria</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:.85rem;">
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Alcohol, Tobacco, Pork</strong> — Any production/distribution</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Gambling & Lotteries</strong> — Casinos, betting</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Riba (Interest)</strong> — Conventional banks as primary business</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Adult Entertainment</strong> — Pornography, adult content</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#fbbf24;">△</span><div><strong>Defence/Weapons</strong> — Complex; varies by madhab</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#34d399;">✓</span><div><strong>Technology, Healthcare, Education</strong> — Generally permissible</div></div>
+          <div id="madhab-screen-note" style="margin-top:6px;padding:8px 10px;border-radius:6px;font-size:.78rem;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="font-weight:700;">Screening History</h3>
+        <button onclick="clearScreenings()" style="font-size:.8rem;color:#a0aec0;background:none;border:none;cursor:pointer;">Clear</button>
+      </div>
+      <div id="screening-history"><p style="color:#a0aec0;text-align:center;padding:20px;font-size:.85rem;">No screenings yet.</p></div>
+    </div>
+  </section>
+
+  <!-- ═══ AI CHAT ═══ -->
+  <section id="sec-chat" class="hidden">
+    <div class="section-title">Amin — Your AI Halal Financial Advisor</div>
+    <p class="section-sub">Ask anything about halal finance. Amin applies your <strong id="chat-madhab-label">Shafi'i</strong> madhab's rulings automatically.</p>
+    <div class="card" style="max-width:800px;">
+      <div style="border-bottom:1px solid #f0f0f0;padding-bottom:12px;margin-bottom:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;">☽</div>
+        <div>
+          <p style="font-weight:700;font-size:.95rem;">Amin — Halal Financial Advisor</p>
+          <p style="font-size:.75rem;color:#718096;"><span id="chat-madhab-badge" style="font-weight:700;color:var(--green);">Shafi'i Madhab</span> · GBP · Claude Opus 4.6</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="suggestQ('How do I invest halal in the UK?')" style="background:var(--green-pale);color:var(--green);border:none;border-radius:20px;padding:4px 10px;font-size:.75rem;cursor:pointer;">Halal investing UK</button>
+          <button onclick="suggestQ('What is a halal mortgage in the UK?')" style="background:var(--green-pale);color:var(--green);border:none;border-radius:20px;padding:4px 10px;font-size:.75rem;cursor:pointer;">Halal mortgage</button>
+          <button onclick="suggestQ('How do I calculate zakat on my savings?')" style="background:var(--green-pale);color:var(--green);border:none;border-radius:20px;padding:4px 10px;font-size:.75rem;cursor:pointer;">Zakat on savings</button>
+        </div>
+      </div>
+      <div id="chatMessages">
+        <div class="msg-ai" id="chat-welcome-msg">
+          <strong>Assalamu Alaikum wa Rahmatullahi wa Barakatuh! 🌙</strong><br><br>
+          I'm Amin, your halal financial advisor following the <strong>Shafi'i madhab</strong>.<br><br>
+          I can help with halal investments, Islamic mortgages, zakat, riba-free banking, takaful, and more — all in <strong>£ GBP</strong>.<br><br>
+          What can I help you with today, InshaaAllah?
+        </div>
+      </div>
+      <div style="border-top:1px solid #f0f0f0;padding-top:16px;display:flex;gap:10px;">
+        <textarea id="chatInput" class="input" style="resize:none;height:52px;flex:1;" placeholder="Ask Amin anything about halal finance..."
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+        <button class="btn-primary" onclick="sendChat()" id="send-btn" style="height:52px;padding:0 20px;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+      <p style="font-size:.72rem;color:#a0aec0;margin-top:8px;text-align:center;">For personal fatwas, always consult a qualified Islamic scholar (mufti). This is guidance only.</p>
+    </div>
+  </section>
+
+  <!-- ═══ DEBTS ═══ -->
+  <section id="sec-debts" class="hidden">
+    <div class="section-title">Debt Tracker</div>
+    <p class="section-sub">Track your debts. Interest-bearing debts are flagged — seek halal alternatives immediately.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;">Add a Debt</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div><label class="label">Description</label><input class="input" id="debt-desc" placeholder="e.g. Student loan, Car finance..."/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div><label class="label">Amount Owed (£)</label><input class="input" id="debt-amount" type="number" placeholder="0"/></div>
+            <div><label class="label">Type</label>
+              <select class="input" id="debt-type">
+                <option value="halal">✅ Interest-Free (Halal)</option>
+                <option value="riba">⚠️ Interest-Bearing (RIBA)</option>
+                <option value="unknown">❓ Unknown</option>
+              </select>
+            </div>
+          </div>
+          <div><label class="label">Creditor / Lender</label><input class="input" id="debt-creditor" placeholder="Bank name, person..."/></div>
+          <button class="btn-primary" onclick="addDebt()">Add Debt</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;">Debt Summary</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;padding:12px;background:var(--green-pale);border-radius:8px;"><span style="color:var(--green);font-weight:600;">Total Debt</span><span id="total-debt" style="font-weight:800;color:var(--green);font-size:1.2rem;">£0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;background:#fee2e2;border-radius:8px;"><span style="color:#991b1b;font-weight:600;">⚠️ Interest-Bearing (HARAM)</span><span id="riba-debt" style="font-weight:800;color:#991b1b;font-size:1.2rem;">£0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;background:#d1fae5;border-radius:8px;"><span style="color:#065f46;font-weight:600;">✅ Interest-Free (Halal)</span><span id="halal-debt" style="font-weight:800;color:#065f46;font-size:1.2rem;">£0.00</span></div>
+        </div>
+        <div id="riba-warning" class="hidden" style="margin-top:12px;background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:12px;font-size:.82rem;color:#7c2d12;">
+          <strong>⚠️ Riba Alert!</strong> You have interest-bearing debts. Please seek halal alternatives:<br>
+          • Al Rayan Bank, Gatehouse Bank (UK Islamic banks)<br>
+          • Qard Hassan from family/community<br>• Islamic mortgage refinancing
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-weight:700;margin-bottom:16px;">Your Debts</h3>
+      <div id="debt-list"><p style="color:#a0aec0;text-align:center;padding:30px;font-size:.85rem;">No debts recorded. Alhamdulillah! 🤲</p></div>
+    </div>
+  </section>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <section id="sec-settings" class="hidden">
+    <div class="section-title">Settings</div>
+    <p class="section-sub">Configure your madhab, name, and gold/silver prices for accurate calculations.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Madhab Selector -->
+        <div class="card">
+          <h3 style="font-weight:700;margin-bottom:4px;color:var(--green);">Select Your Madhab</h3>
+          <p style="font-size:.82rem;color:#718096;margin-bottom:16px;">All zakat rules, AI advice, and financial guidance will follow your chosen madhab.</p>
+          <div class="madhab-grid">
+
+            <label class="madhab-card" id="mc-shafii" onclick="selectMadhab('shafii')">
+              <input type="radio" name="madhab" value="shafii"/>
+              <div class="madhab-check" id="mcheck-shafii">✓</div>
+              <div class="madhab-card-name">Shafi'i</div>
+              <div class="madhab-card-arabic">الشافعي</div>
+              <div class="madhab-card-key">Gold nisab (85g) · Debts NOT deducted · Jewelry zakatable</div>
+            </label>
+
+            <label class="madhab-card" id="mc-hanafi" onclick="selectMadhab('hanafi')">
+              <input type="radio" name="madhab" value="hanafi"/>
+              <div class="madhab-check" id="mcheck-hanafi"></div>
+              <div class="madhab-card-name">Hanafi</div>
+              <div class="madhab-card-arabic">الحنفي</div>
+              <div class="madhab-card-key">Silver nisab (612g) · Debts deductible · Women's jewelry exempt</div>
+            </label>
+
+            <label class="madhab-card" id="mc-maliki" onclick="selectMadhab('maliki')">
+              <input type="radio" name="madhab" value="maliki"/>
+              <div class="madhab-check" id="mcheck-maliki"></div>
+              <div class="madhab-card-name">Maliki</div>
+              <div class="madhab-card-arabic">المالكي</div>
+              <div class="madhab-card-key">Gold nisab (85g) · Debts deductible · Adornment jewelry exempt</div>
+            </label>
+
+            <label class="madhab-card" id="mc-hanbali" onclick="selectMadhab('hanbali')">
+              <input type="radio" name="madhab" value="hanbali"/>
+              <div class="madhab-check" id="mcheck-hanbali"></div>
+              <div class="madhab-card-name">Hanbali</div>
+              <div class="madhab-card-arabic">الحنبلي</div>
+              <div class="madhab-card-key">Lower of gold/silver nisab · Debts deductible · All jewelry zakatable</div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Personal -->
+        <div class="card">
+          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Personal Settings</h3>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div><label class="label">Your Name</label><input class="input" id="settings-name" placeholder="Your name"/></div>
+            <div>
+              <label class="label">Gold Price (£ per gram)</label>
+              <input class="input" id="settings-gold" type="number" placeholder="75" step="0.01"/>
+              <p style="font-size:.75rem;color:#718096;margin-top:3px;">Check Google "gold price per gram GBP" for today's rate. Used for nisab calculation.</p>
+            </div>
+            <div>
+              <label class="label">Silver Price (£ per gram)</label>
+              <input class="input" id="settings-silver" type="number" placeholder="0.72" step="0.001"/>
+              <p style="font-size:.75rem;color:#718096;margin-top:3px;">Used for Hanafi/Hanbali silver nisab calculation. Check live silver prices.</p>
+            </div>
+            <button class="btn-primary" onclick="saveSettings()">Save All Settings</button>
+            <div id="settings-saved" class="hidden" style="background:#d1fae5;color:#065f46;border-radius:8px;padding:10px;text-align:center;font-size:.85rem;font-weight:600;">✓ Settings saved!</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Madhab Comparison — Zakat Rules</h3>
+        <div style="font-size:.82rem;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:var(--green-pale);">
+                <th style="padding:8px;text-align:left;border-radius:6px 0 0 6px;color:var(--green);">Rule</th>
+                <th style="padding:8px;text-align:center;color:var(--green);">Shafi'i</th>
+                <th style="padding:8px;text-align:center;color:#3b82f6;">Hanafi</th>
+                <th style="padding:8px;text-align:center;color:#f97316;">Maliki</th>
+                <th style="padding:8px;text-align:center;border-radius:0 6px 6px 0;color:#a855f7;">Hanbali</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #f0f0f0;">
+                <td style="padding:8px;font-weight:600;">Nisab Standard</td>
+                <td style="padding:8px;text-align:center;">Gold only<br><small style="color:#718096;">85g</small></td>
+                <td style="padding:8px;text-align:center;">Silver (lower)<br><small style="color:#718096;">612g Ag</small></td>
+                <td style="padding:8px;text-align:center;">Gold<br><small style="color:#718096;">85g</small></td>
+                <td style="padding:8px;text-align:center;">Lower of both<br><small style="color:#718096;">85g Au / 595g Ag</small></td>
+              </tr>
+              <tr style="border-bottom:1px solid #f0f0f0;">
+                <td style="padding:8px;font-weight:600;">Debts Deductible?</td>
+                <td style="padding:8px;text-align:center;color:#e53e3e;">✗ No</td>
+                <td style="padding:8px;text-align:center;color:#2e8b57;">✓ Yes</td>
+                <td style="padding:8px;text-align:center;color:#2e8b57;">✓ Yes</td>
+                <td style="padding:8px;text-align:center;color:#2e8b57;">✓ Yes</td>
+              </tr>
+              <tr style="border-bottom:1px solid #f0f0f0;">
+                <td style="padding:8px;font-weight:600;">Women's Jewelry</td>
+                <td style="padding:8px;text-align:center;color:#e53e3e;">Zakatable<br><small style="color:#718096;">(if &gt;85g)</small></td>
+                <td style="padding:8px;text-align:center;color:#2e8b57;">Exempt<br><small style="color:#718096;">(personal use)</small></td>
+                <td style="padding:8px;text-align:center;color:#2e8b57;">Exempt<br><small style="color:#718096;">(adornment)</small></td>
+                <td style="padding:8px;text-align:center;color:#e53e3e;">Zakatable<br><small style="color:#718096;">(all gold)</small></td>
+              </tr>
+              <tr>
+                <td style="padding:8px;font-weight:600;">Zakat Rate</td>
+                <td style="padding:8px;text-align:center;">2.5%</td>
+                <td style="padding:8px;text-align:center;">2.5%</td>
+                <td style="padding:8px;text-align:center;">2.5%</td>
+                <td style="padding:8px;text-align:center;">2.5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:20px;padding:12px 16px;background:#fef3c7;border-radius:8px;border-left:3px solid var(--gold);font-size:.78rem;color:#92400e;">
+          <strong>Note:</strong> All four madhabs are valid and complete. Follow the madhab you were raised in or the one you follow consistently. Mixing madhabs (talfiq) for convenience is generally discouraged — consult your local imam or scholar.
+        </div>
+        <div style="margin-top:16px;padding:12px 16px;background:var(--green-pale);border-radius:8px;">
+          <p style="font-size:.82rem;font-weight:700;color:var(--green);margin-bottom:8px;">Recommended UK Halal Finance:</p>
+          <ul style="font-size:.78rem;color:#4a5568;list-style:none;padding:0;display:flex;flex-direction:column;gap:3px;">
+            <li>• Al Rayan Bank — alrayanbank.co.uk</li>
+            <li>• Gatehouse Bank — gatehousebank.com</li>
+            <li>• Wahed Invest — wahedinvest.com</li>
+            <li>• Islamic Finance Guru — islamicfinanceguru.com</li>
+            <li>• National Zakat Foundation — nzf.org.uk</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// MADHAB CONFIGURATION
+// ─────────────────────────────────────────────
+
+const MADHAB_CONFIG = {
+  shafii: {
+    name: "Shafi'i",
+    arabic: "الشافعي",
+    color: "var(--green)",
+    nisabStandard: 'gold_only',
+    nisabGoldGrams: 85,
+    nisabSilverGrams: null,
+    debtsDeductible: false,
+    jewelryExempt: false,
+    bannerClass: 'shafii',
+    bannerText: "<strong>Shafi'i Madhab (الشافعي):</strong> Nisab = 85g gold only. Debts do <u>not</u> reduce zakatable wealth. Gold jewellery above 85g is zakatable.",
+    goldJewelryNote: "In Shafi'i madhab, gold jewellery is zakatable if total gold exceeds the 85g nisab.",
+    debtNote: "",
+    debtLabel: "(Shafi'i: debts are NOT deductible — leave as 0)",
+    nisabLabel: "Nisab (85g gold)"
+  },
+  hanafi: {
+    name: "Hanafi",
+    arabic: "الحنفي",
+    color: "#3b82f6",
+    nisabStandard: 'lower_of_both',
+    nisabGoldGrams: 87.48,
+    nisabSilverGrams: 612.36,
+    debtsDeductible: true,
+    jewelryExempt: true,
+    bannerClass: 'hanafi',
+    bannerText: "<strong>Hanafi Madhab (الحنفي):</strong> Nisab = lower of 612.36g silver or 87.48g gold (silver is usually lower). Debts <u>can</u> be deducted. Women's personal gold jewellery is <u>exempt</u>.",
+    goldJewelryNote: "In Hanafi madhab, women's personal-use gold jewellery is EXEMPT from zakat. Only enter investment/trade gold here.",
+    debtNote: "In Hanafi madhab, deductible debts reduce your zakatable wealth. Enter the total amount of personal debts due within this year.",
+    debtLabel: "(Hanafi: enter debts to deduct from zakatable wealth)",
+    nisabLabel: "Nisab (lower of 87.48g gold / 612.36g silver)"
+  },
+  maliki: {
+    name: "Maliki",
+    arabic: "المالكي",
+    color: "#f97316",
+    nisabStandard: 'gold_primary',
+    nisabGoldGrams: 85,
+    nisabSilverGrams: 595,
+    debtsDeductible: true,
+    jewelryExempt: true,
+    bannerClass: 'maliki',
+    bannerText: "<strong>Maliki Madhab (المالكي):</strong> Nisab = 85g gold. Debts <u>can</u> be deducted (immediate necessity debts). Personal adornment jewellery is <u>exempt</u>.",
+    goldJewelryNote: "In Maliki madhab, gold jewellery worn regularly for personal adornment is EXEMPT. Only enter investment/trade gold here.",
+    debtNote: "In Maliki madhab, debts of immediate necessity are deductible. Long-term debts (e.g. mortgages) — consult a scholar.",
+    debtLabel: "(Maliki: enter immediate necessity debts to deduct)",
+    nisabLabel: "Nisab (85g gold)"
+  },
+  hanbali: {
+    name: "Hanbali",
+    arabic: "الحنبلي",
+    color: "#a855f7",
+    nisabStandard: 'lower_of_both',
+    nisabGoldGrams: 85,
+    nisabSilverGrams: 595,
+    debtsDeductible: true,
+    jewelryExempt: false,
+    bannerClass: 'hanbali',
+    bannerText: "<strong>Hanbali Madhab (الحنبلي):</strong> Nisab = lower of 85g gold or 595g silver (silver is usually lower). Debts <u>can</u> be deducted. All gold jewellery (including personal) <u>is zakatable</u>.",
+    goldJewelryNote: "In Hanbali madhab, ALL gold and silver (including personal jewellery) is zakatable. Enter the total grams you own.",
+    debtNote: "In Hanbali madhab, debts can be deducted. The predominant view allows deduction of the amount due within the current year.",
+    debtLabel: "(Hanbali: enter debts due this year to deduct)",
+    nisabLabel: "Nisab (lower of 85g gold / 595g silver)"
+  }
+};
+
+// ─────────────────────────────────────────────
+// DATA STORE
+// ─────────────────────────────────────────────
+
+let data = {
+  transactions: [],
+  debts: [],
+  screenings: [],
+  chatHistory: [],
+  settings: {
+    name: 'Brother/Sister',
+    madhab: 'shafii',
+    goldPriceGBP: 75,
+    silverPriceGBP: 0.72
+  }
+};
+
+const HARAM_CATS = ['interest_income'];
+
+function loadData() {
+  const saved = localStorage.getItem('halalAdvisorData_v3');
+  if (saved) {
+    try { const p = JSON.parse(saved); data = { ...data, ...p }; } catch(e) {}
+  }
+}
+
+function saveData() {
+  localStorage.setItem('halalAdvisorData_v3', JSON.stringify(data));
+}
+
+function getMadhab() {
+  return data.settings.madhab || 'shafii';
+}
+
+function getMadhabCfg() {
+  return MADHAB_CONFIG[getMadhab()];
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+
+function showSection(name, el) {
+  document.querySelectorAll('[id^="sec-"]').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.remove('hidden');
+  if (el) el.classList.add('active');
+  renderAll();
+}
+
+// ─────────────────────────────────────────────
+// MADHAB SELECTION
+// ─────────────────────────────────────────────
+
+function selectMadhab(m) {
+  data.settings.madhab = m;
+  updateMadhabUI();
+}
+
+function updateMadhabUI() {
+  const m = getMadhab();
+  const cfg = getMadhabCfg();
+
+  // Sidebar
+  document.getElementById('sidebar-madhab-display').textContent = cfg.name + ' Madhab · GBP';
+
+  // Header
+  const headerName = document.getElementById('header-madhab-name');
+  if (headerName) headerName.textContent = cfg.name;
+
+  // Cards in settings
+  ['shafii','hanafi','maliki','hanbali'].forEach(x => {
+    const card = document.getElementById('mc-' + x);
+    const check = document.getElementById('mcheck-' + x);
+    if (card) card.classList.toggle('selected', x === m);
+    if (check) check.textContent = x === m ? '✓' : '';
+  });
+
+  // Chat labels
+  ['chat-madhab-label','chat-madhab-badge','screen-madhab-label'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = cfg.name;
+  });
+
+  // Update chat welcome message
+  const welcome = document.getElementById('chat-welcome-msg');
+  if (welcome) {
+    welcome.innerHTML = `<strong>Assalamu Alaikum wa Rahmatullahi wa Barakatuh! 🌙</strong><br><br>
+      I'm Amin, your halal financial advisor following the <strong>${cfg.name} madhab (${cfg.arabic})</strong>.<br><br>
+      I can help with halal investments, Islamic mortgages, zakat, riba-free banking, takaful, and more — all in <strong>£ GBP</strong> and according to <strong>${cfg.name}</strong> rulings.<br><br>
+      What can I help you with today, InshaaAllah?`;
+  }
+
+  // Zakat section
+  const banner = document.getElementById('zakat-madhab-banner');
+  if (banner) {
+    banner.className = 'madhab-banner ' + cfg.bannerClass;
+    banner.innerHTML = cfg.bannerText;
+  }
+
+  const sub = document.getElementById('zakat-sub-text');
+  if (sub) sub.innerHTML = `Calculating according to the <strong>${cfg.name} madhab</strong>. ${cfg.nisabLabel}.`;
+
+  const jewelryNote = document.getElementById('gold-jewelry-note');
+  if (jewelryNote) jewelryNote.textContent = cfg.goldJewelryNote;
+
+  const debtSection = document.getElementById('z-debt-section');
+  const debtLabel = document.getElementById('debt-deduct-label');
+  const debtNote = document.getElementById('debt-deduct-note');
+  const debtDeductLine = document.getElementById('z-debt-deduct-line');
+
+  if (cfg.debtsDeductible) {
+    if (debtSection) debtSection.style.opacity = '1';
+    if (debtLabel) debtLabel.textContent = cfg.debtLabel;
+    if (debtNote) debtNote.textContent = cfg.debtNote;
+    if (debtDeductLine) debtDeductLine.classList.remove('hidden');
+  } else {
+    if (debtSection) debtSection.style.opacity = '0.4';
+    if (debtLabel) debtLabel.textContent = cfg.debtLabel;
+    if (debtNote) debtNote.textContent = cfg.debtNote;
+    if (debtDeductLine) debtDeductLine.classList.add('hidden');
+  }
+
+  // Investment screener note
+  const screenNote = document.getElementById('madhab-screen-note');
+  if (screenNote) {
+    const notes = {
+      shafii:  { bg:'#e8f5ee', color:'#1a5c38', text:"Shafi'i: Defence/weapons cautioned. Darura (necessity) rarely permits haram investments." },
+      hanafi:  { bg:'#eff6ff', color:'#1d4ed8', text:"Hanafi: Most developed commercial jurisprudence. Istisna' (manufacturing contracts) uniquely permissible." },
+      maliki:  { bg:'#fff7ed', color:'#c2410c', text:"Maliki: Maslaha (public interest) principle can affect some rulings. Widely followed in North Africa." },
+      hanbali: { bg:'#fdf4ff', color:'#7e22ce', text:"Hanbali: Most conservative of four madhabs. Forms basis of Saudi/GCC Islamic finance regulation." }
+    };
+    const n = notes[m];
+    screenNote.style.background = n.bg;
+    screenNote.style.color = n.color;
+    screenNote.textContent = n.text;
+  }
+}
+
+// ─────────────────────────────────────────────
+// NISAB CALCULATION
+// ─────────────────────────────────────────────
+
+function getNisab() {
+  const cfg = getMadhabCfg();
+  const gold = data.settings.goldPriceGBP;
+  const silver = data.settings.silverPriceGBP;
+  const goldNisab = cfg.nisabGoldGrams * gold;
+
+  if (cfg.nisabStandard === 'gold_only') {
+    return { amount: goldNisab, label: `85g gold × £${gold}/g` };
+  }
+  if (cfg.nisabStandard === 'lower_of_both') {
+    const silverNisab = cfg.nisabSilverGrams * silver;
+    if (silverNisab < goldNisab) {
+      return { amount: silverNisab, label: `${cfg.nisabSilverGrams}g silver × £${silver}/g (lower)` };
+    }
+    return { amount: goldNisab, label: `${cfg.nisabGoldGrams}g gold × £${gold}/g (lower)` };
+  }
+  // gold_primary (Maliki)
+  return { amount: goldNisab, label: `85g gold × £${gold}/g` };
+}
+
+// ─────────────────────────────────────────────
+// TRANSACTIONS
+// ─────────────────────────────────────────────
+
+function quickAddTransaction() {
+  const desc = document.getElementById('quick-desc').value.trim();
+  const amount = parseFloat(document.getElementById('quick-amount').value);
+  const type = document.getElementById('quick-type').value;
+  const cat = document.getElementById('quick-cat').value;
+  if (!desc || !amount || amount <= 0) { alert('Please enter a description and valid amount.'); return; }
+  data.transactions.unshift({ id: Date.now(), desc, amount, type, cat, date: new Date().toLocaleDateString('en-GB'), haram: HARAM_CATS.includes(cat) });
+  saveData();
+  document.getElementById('quick-desc').value = '';
+  document.getElementById('quick-amount').value = '';
+  renderAll();
+  alert('Transaction added! ✓');
+}
+
+function deleteTransaction(id) {
+  data.transactions = data.transactions.filter(t => t.id !== id);
+  saveData(); renderAll();
+}
+
+function clearAllTransactions() {
+  if (confirm('Delete all transactions?')) { data.transactions = []; saveData(); renderAll(); }
+}
+
+let currentFilter = 'all';
+
+function filterTxns(f) {
+  currentFilter = f;
+  ['all','income','expense','haram'].forEach(x => {
+    const btn = document.getElementById('filter-' + x);
+    if (!btn) return;
+    btn.className = x === f ? 'btn-primary' : 'btn-outline';
+    if (x === 'haram' && x !== f) { btn.style.color='#e53e3e'; btn.style.borderColor='#e53e3e'; }
+    else if (x !== f) { btn.style.color=''; btn.style.borderColor=''; }
+  });
+  renderBudget();
+}
+
+function renderRecentTxns() {
+  const el = document.getElementById('recent-txns');
+  const recent = data.transactions.slice(0, 6);
+  if (!recent.length) { el.innerHTML = '<p style="color:#a0aec0;font-size:.85rem;text-align:center;margin-top:40px;">No transactions yet.</p>'; return; }
+  el.innerHTML = recent.map(t => `
+    <div class="txn-row">
+      <div><p style="font-weight:600;font-size:.88rem;">${t.desc} ${t.haram ? '<span style="color:#e53e3e;font-size:.75rem;">⚠️ HARAM</span>' : ''}</p>
+        <p style="font-size:.76rem;color:#a0aec0;">${t.cat} · ${t.date}</p></div>
+      <span style="font-weight:700;color:${t.type==='income'?'#2e8b57':'#e53e3e'};">${t.type==='income'?'+':'-'}£${t.amount.toFixed(2)}</span>
+    </div>`).join('');
+}
+
+function renderBudget() {
+  let filtered = data.transactions;
+  if (currentFilter === 'income') filtered = filtered.filter(t=>t.type==='income');
+  else if (currentFilter === 'expense') filtered = filtered.filter(t=>t.type==='expense');
+  else if (currentFilter === 'haram') filtered = filtered.filter(t=>t.haram);
+  const el = document.getElementById('budget-txn-list');
+  if (!filtered.length) { el.innerHTML = '<p style="color:#a0aec0;text-align:center;padding:30px;font-size:.85rem;">No transactions in this category.</p>'; }
+  else {
+    el.innerHTML = filtered.map(t => `
+      <div class="txn-row">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <p style="font-weight:600;font-size:.88rem;">${t.desc}</p>
+            ${t.haram ? '<span class="badge badge-haram">⚠️ HARAM</span>' : '<span class="badge badge-halal">✓ HALAL</span>'}
+          </div>
+          <p style="font-size:.76rem;color:#a0aec0;">${t.cat} · ${t.date}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-weight:700;font-size:1rem;color:${t.type==='income'?'#2e8b57':'#e53e3e'};">${t.type==='income'?'+':'-'}£${t.amount.toFixed(2)}</span>
+          <button class="btn-danger" onclick="deleteTransaction(${t.id})">✕</button>
+        </div>
+      </div>`).join('');
+  }
+  const income = data.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const expense = data.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('budget-total-income').textContent = '£'+income.toFixed(2);
+  document.getElementById('budget-total-expense').textContent = '£'+expense.toFixed(2);
+  const net = income - expense;
+  const netEl = document.getElementById('budget-net');
+  netEl.textContent = (net>=0?'+':'')+'£'+net.toFixed(2);
+  netEl.style.color = net>=0?'#2e8b57':'#e53e3e';
+}
+
+// ─────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────
+
+function renderDashboard() {
+  document.getElementById('welcomeName').textContent = data.settings.name;
+  const now = new Date();
+  const mo = `${now.getMonth()}/${now.getFullYear()}`;
+  const mIncome = data.transactions.filter(t=>t.type==='income'&&getMonthKey(t.date)===mo).reduce((s,t)=>s+t.amount,0);
+  const mExpense = data.transactions.filter(t=>t.type==='expense'&&getMonthKey(t.date)===mo).reduce((s,t)=>s+t.amount,0);
+  const totalIncome = data.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpense = data.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const assets = Math.max(0, totalIncome - totalExpense);
+  document.getElementById('dash-assets').textContent = '£'+assets.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  document.getElementById('dash-income').textContent = '£'+mIncome.toFixed(2);
+  document.getElementById('dash-expenses').textContent = '£'+mExpense.toFixed(2);
+  const { amount: nisab, label } = getNisab();
+  document.getElementById('dash-madhab-nisab').textContent = getMadhabCfg().name + ' · ' + label;
+  if (assets >= nisab) {
+    document.getElementById('dash-zakat').textContent = '⚠️ Zakat Due!';
+    document.getElementById('dash-zakat').style.color = '#e53e3e';
+  } else {
+    document.getElementById('dash-zakat').textContent = 'Below Nisab ✓';
+    document.getElementById('dash-zakat').style.color = '#2e8b57';
+  }
+}
+
+function getMonthKey(d) {
+  if (!d) return '';
+  const p = d.split('/');
+  return p.length===3 ? `${parseInt(p[1])-1}/${p[2]}` : '';
+}
+
+// ─────────────────────────────────────────────
+// ZAKAT CALCULATOR
+// ─────────────────────────────────────────────
+
+function calculateZakat() {
+  const cfg = getMadhabCfg();
+  const { amount: nisab, label: nisabLabel } = getNisab();
+
+  const cash = parseFloat(document.getElementById('z-cash').value)||0;
+  const invest = parseFloat(document.getElementById('z-invest').value)||0;
+  const goldGrams = parseFloat(document.getElementById('z-gold-grams').value)||0;
+  const silverGrams = parseFloat(document.getElementById('z-silver-grams').value)||0;
+  const business = parseFloat(document.getElementById('z-business').value)||0;
+  const receivables = parseFloat(document.getElementById('z-receivables').value)||0;
+  const debts = cfg.debtsDeductible ? (parseFloat(document.getElementById('z-debts').value)||0) : 0;
+
+  const goldValue = goldGrams * data.settings.goldPriceGBP;
+  const silverValue = silverGrams * data.settings.silverPriceGBP;
+  const gross = cash + invest + goldValue + silverValue + business + receivables;
+  const net = Math.max(0, gross - debts);
+
+  document.getElementById('z-gross-display').textContent = '£'+gross.toFixed(2);
+  document.getElementById('z-debt-deduct-val').textContent = '-£'+debts.toFixed(2);
+  document.getElementById('z-total-display').textContent = '£'+net.toFixed(2);
+
+  const nisabEl = document.getElementById('z-nisab-line');
+  nisabEl.textContent = '£'+nisab.toFixed(2);
+  document.getElementById('nisab-label-line').textContent = nisabLabel;
+
+  const nisabInfoBox = document.getElementById('nisab-info-box');
+  nisabInfoBox.innerHTML = `<strong>Nisab (${cfg.name}):</strong> ${nisabLabel} = <strong>£${nisab.toFixed(2)}</strong>`;
+
+  const progress = Math.min(100, (net/nisab)*100);
+  document.getElementById('zakat-progress').style.width = progress+'%';
+
+  const resultCard = document.getElementById('zakat-result-card');
+  const dueEl = document.getElementById('z-due-display');
+
+  if (net >= nisab) {
+    const due = net * 0.025;
+    dueEl.textContent = '£'+due.toFixed(2);
+    resultCard.className = 'nisab-above';
+    resultCard.innerHTML = `
+      <p style="font-weight:700;font-size:1.1rem;margin-bottom:4px;">✓ Zakat is Due (${cfg.name} Madhab)</p>
+      <p style="font-size:.85rem;">Net zakatable wealth (£${net.toFixed(2)}) exceeds the nisab (£${nisab.toFixed(2)}).</p>
+      <p style="font-size:.85rem;margin-top:4px;"><strong>You owe: £${due.toFixed(2)}</strong> — 2.5% of net zakatable wealth.</p>
+      <p style="font-size:.78rem;margin-top:8px;opacity:.85;">Remember: Hawl (one lunar year) must have passed. Confirm with your scholar.</p>`;
+  } else {
+    dueEl.textContent = '£0.00';
+    resultCard.className = 'nisab-below';
+    resultCard.innerHTML = `
+      <p style="font-weight:700;font-size:1.1rem;margin-bottom:4px;">Zakat Not Yet Due (${cfg.name} Madhab)</p>
+      <p style="font-size:.85rem;">Net wealth (£${net.toFixed(2)}) is below the nisab of £${nisab.toFixed(2)}.</p>
+      <p style="font-size:.85rem;margin-top:4px;">You are £${(nisab-net).toFixed(2)} below the threshold.</p>`;
+  }
+}
+
+function calcFitrana() {
+  const people = parseInt(document.getElementById('z-fitrana-people').value)||1;
+  const amt = parseFloat(document.getElementById('z-fitrana-amount').value)||7;
+  document.getElementById('z-fitrana-total').textContent = '£'+(people*amt).toFixed(2);
+}
+
+// ─────────────────────────────────────────────
+// INVESTMENT SCREENER
+// ─────────────────────────────────────────────
+
+async function screenInvestment() {
+  const company = document.getElementById('screen-input').value.trim();
+  if (!company) { alert('Please enter a company or fund name.'); return; }
+  const btn = document.getElementById('screen-btn');
+  const result = document.getElementById('screen-result');
+  btn.disabled = true; btn.textContent = 'Screening...';
+  result.innerHTML = '<p style="color:#718096;font-size:.85rem;text-align:center;padding:16px;">Consulting Islamic finance principles...</p>';
+  try {
+    const res = await fetch('/api/screen', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ company, madhab: getMadhab() })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const d = await res.json();
+    const clsMap = {HALAL:'verdict-halal',HARAM:'verdict-haram',DOUBTFUL:'verdict-doubtful',UNKNOWN:'verdict-unknown'};
+    const iconMap = {HALAL:'✅',HARAM:'🚫',DOUBTFUL:'⚠️',UNKNOWN:'❓'};
+    const badgeMap = {HALAL:'badge-halal',HARAM:'badge-haram',DOUBTFUL:'badge-doubtful',UNKNOWN:'badge-unknown'};
+    result.innerHTML = `
+      <div class="${clsMap[d.verdict]||'verdict-unknown'}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="font-size:1.5rem;">${iconMap[d.verdict]||'❓'}</span>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-weight:800;font-size:1.1rem;">${d.verdict}</span>
+              <span class="badge ${badgeMap[d.verdict]||'badge-unknown'}">${d.confidence} confidence</span>
+              <span class="badge" style="background:#f3f4f6;color:#4b5563;">${getMadhabCfg().name}</span>
+            </div>
+            <p style="font-size:.85rem;margin-top:2px;">${d.summary}</p>
+          </div>
+        </div>
+        ${d.reasons?.length?`<div style="margin-top:8px;"><strong style="font-size:.8rem;">Key Points:</strong><ul style="margin:4px 0 0 16px;font-size:.82rem;">${d.reasons.map(r=>`<li>${r}</li>`).join('')}</ul></div>`:''}
+        ${d.concerns?.length?`<div style="margin-top:8px;"><strong style="font-size:.8rem;color:#92400e;">Concerns:</strong><ul style="margin:4px 0 0 16px;font-size:.82rem;">${d.concerns.map(c=>`<li>${c}</li>`).join('')}</ul></div>`:''}
+        ${d.madhab_note?`<div style="margin-top:8px;padding:8px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:.82rem;"><strong>${getMadhabCfg().name} Madhab Note:</strong> ${d.madhab_note}</div>`:''}
+        <div style="margin-top:10px;padding:8px;background:rgba(255,255,255,0.5);border-radius:6px;font-size:.82rem;"><strong>Recommendation:</strong> ${d.recommendation}</div>
+      </div>`;
+    data.screenings.unshift({ company, verdict: d.verdict, summary: d.summary, madhab: getMadhabCfg().name, date: new Date().toLocaleDateString('en-GB') });
+    if (data.screenings.length>20) data.screenings = data.screenings.slice(0,20);
+    saveData(); renderScreeningHistory();
+  } catch(e) {
+    result.innerHTML = `<div style="background:#fee2e2;border-radius:8px;padding:12px;color:#991b1b;font-size:.85rem;">Error: ${e.message}</div>`;
+  } finally { btn.disabled=false; btn.textContent='Screen for Halal Compliance'; }
+}
+
+function renderScreeningHistory() {
+  const el = document.getElementById('screening-history');
+  if (!data.screenings.length) { el.innerHTML = '<p style="color:#a0aec0;text-align:center;padding:20px;font-size:.85rem;">No screenings yet.</p>'; return; }
+  const icons={HALAL:'✅',HARAM:'🚫',DOUBTFUL:'⚠️',UNKNOWN:'❓'};
+  const bmap={HALAL:'badge-halal',HARAM:'badge-haram',DOUBTFUL:'badge-doubtful',UNKNOWN:'badge-unknown'};
+  el.innerHTML = data.screenings.map(s=>`
+    <div class="txn-row">
+      <div><p style="font-weight:600;font-size:.88rem;">${icons[s.verdict]||'❓'} ${s.company}</p>
+        <p style="font-size:.76rem;color:#a0aec0;">${s.summary} · ${s.madhab||''} · ${s.date}</p></div>
+      <span class="badge ${bmap[s.verdict]||'badge-unknown'}">${s.verdict}</span>
+    </div>`).join('');
+}
+
+function clearScreenings() {
+  if (confirm('Clear screening history?')) { data.screenings=[]; saveData(); renderScreeningHistory(); }
+}
+
+// ─────────────────────────────────────────────
+// AI CHAT
+// ─────────────────────────────────────────────
+
+function suggestQ(q) { document.getElementById('chatInput').value = q; sendChat(); }
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const chatEl = document.getElementById('chatMessages');
+  input.value = '';
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msg-user'; userDiv.textContent = msg;
+  chatEl.appendChild(userDiv);
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'msg-ai';
+  typingDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  chatEl.appendChild(typingDiv);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  data.chatHistory.push({ role:'user', content: msg });
+  if (data.chatHistory.length>20) data.chatHistory = data.chatHistory.slice(-20);
+  const btn = document.getElementById('send-btn'); btn.disabled = true;
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages: data.chatHistory, madhab: getMadhab() })
+    });
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const reader = res.body.getReader(); const decoder = new TextDecoder();
+    let aiText = ''; typingDiv.innerHTML = '';
+    while(true) {
+      const {done,value} = await reader.read(); if(done) break;
+      const chunk = decoder.decode(value, {stream:true});
+      for (const line of chunk.split('\n')) {
+        if (line.startsWith('data: ')) {
+          const s = line.slice(6).trim();
+          if (s==='[DONE]') break;
+          try {
+            const p = JSON.parse(s);
+            if (p.error) { typingDiv.innerHTML=`<span style="color:#e53e3e;">Error: ${p.error}</span>`; break; }
+            if (p.text) {
+              aiText += p.text;
+              typingDiv.innerHTML = aiText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+              chatEl.scrollTop = chatEl.scrollHeight;
+            }
+          } catch(e){}
+        }
+      }
+    }
+    if (aiText) { data.chatHistory.push({ role:'assistant', content: aiText }); saveData(); }
+  } catch(e) {
+    typingDiv.innerHTML = `<span style="color:#e53e3e;">Failed: ${e.message}. Ensure the server is running and API key is set in .env</span>`;
+  } finally { btn.disabled=false; chatEl.scrollTop=chatEl.scrollHeight; }
+}
+
+// ─────────────────────────────────────────────
+// DEBTS
+// ─────────────────────────────────────────────
+
+function addDebt() {
+  const desc = document.getElementById('debt-desc').value.trim();
+  const amount = parseFloat(document.getElementById('debt-amount').value);
+  const type = document.getElementById('debt-type').value;
+  const creditor = document.getElementById('debt-creditor').value.trim();
+  if (!desc || !amount || amount<=0) { alert('Please fill in description and amount.'); return; }
+  data.debts.push({ id:Date.now(), desc, amount, type, creditor, date: new Date().toLocaleDateString('en-GB') });
+  saveData();
+  document.getElementById('debt-desc').value=''; document.getElementById('debt-amount').value=''; document.getElementById('debt-creditor').value='';
+  renderDebts();
+}
+
+function deleteDebt(id) { data.debts=data.debts.filter(d=>d.id!==id); saveData(); renderDebts(); }
+
+function renderDebts() {
+  const total = data.debts.reduce((s,d)=>s+d.amount,0);
+  const riba = data.debts.filter(d=>d.type==='riba').reduce((s,d)=>s+d.amount,0);
+  const halal = data.debts.filter(d=>d.type==='halal').reduce((s,d)=>s+d.amount,0);
+  document.getElementById('total-debt').textContent='£'+total.toFixed(2);
+  document.getElementById('riba-debt').textContent='£'+riba.toFixed(2);
+  document.getElementById('halal-debt').textContent='£'+halal.toFixed(2);
+  document.getElementById('riba-warning').classList.toggle('hidden', riba===0);
+  const el=document.getElementById('debt-list');
+  if (!data.debts.length) { el.innerHTML='<p style="color:#a0aec0;text-align:center;padding:30px;font-size:.85rem;">No debts recorded. Alhamdulillah! 🤲</p>'; return; }
+  const icons={halal:'✅',riba:'⚠️',unknown:'❓'};
+  const cls={halal:'badge-halal',riba:'badge-haram',unknown:'badge-unknown'};
+  el.innerHTML=data.debts.map(d=>`
+    <div class="txn-row">
+      <div style="flex:1;"><div style="display:flex;align-items:center;gap:8px;">
+        <p style="font-weight:600;font-size:.88rem;">${d.desc}</p>
+        <span class="badge ${cls[d.type]}">${icons[d.type]} ${d.type.toUpperCase()}</span></div>
+        <p style="font-size:.76rem;color:#a0aec0;">${d.creditor||'Unknown creditor'} · ${d.date}</p></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-weight:700;color:#e53e3e;">£${d.amount.toFixed(2)}</span>
+        <button class="btn-danger" onclick="deleteDebt(${d.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// SETTINGS
+// ─────────────────────────────────────────────
+
+function loadSettingsForm() {
+  document.getElementById('settings-name').value = data.settings.name;
+  document.getElementById('settings-gold').value = data.settings.goldPriceGBP;
+  document.getElementById('settings-silver').value = data.settings.silverPriceGBP;
+}
+
+function saveSettings() {
+  data.settings.name = document.getElementById('settings-name').value.trim() || 'Brother/Sister';
+  data.settings.goldPriceGBP = parseFloat(document.getElementById('settings-gold').value)||75;
+  data.settings.silverPriceGBP = parseFloat(document.getElementById('settings-silver').value)||0.72;
+  saveData();
+  const msg = document.getElementById('settings-saved');
+  msg.classList.remove('hidden');
+  setTimeout(()=>msg.classList.add('hidden'), 2000);
+  renderAll();
+}
+
+// ─────────────────────────────────────────────
+// RENDER ALL
+// ─────────────────────────────────────────────
+
+function renderAll() {
+  updateMadhabUI();
+  renderDashboard();
+  renderRecentTxns();
+  renderBudget();
+  renderScreeningHistory();
+  renderDebts();
+  loadSettingsForm();
+  calculateZakat();
+  calcFitrana();
+}
+
+// Init
+loadData();
+renderAll();
+</script>
+</body>
+</html>
