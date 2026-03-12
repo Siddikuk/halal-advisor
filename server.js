@@ -214,6 +214,19 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// Extract JSON from a string that may be wrapped in markdown code fences
+function extractJSON(text) {
+  // Strip ```json ... ``` or ``` ... ``` fences
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) return fenced[1].trim();
+  // Fall back to finding the first { ... } block
+  const braceMatch = text.match(/\{[\s\S]*\}/);
+  if (braceMatch) return braceMatch[0].trim();
+  return text.trim();
+}
+
+const SCREEN_SYSTEM = `You are a Sharia compliance analyst. You respond ONLY with a raw JSON object — no markdown, no code fences, no explanation text before or after. Just the JSON.`;
+
 // Investment screening endpoint
 app.post('/api/screen', async (req, res) => {
   const { company, madhab } = req.body;
@@ -221,48 +234,68 @@ app.post('/api/screen', async (req, res) => {
   if (!company) return res.status(400).json({ error: 'Company name required' });
 
   const madhhabName = MADHAB_NAMES[madhab] || MADHAB_NAMES['shafii'];
+  const m = ['shafii','hanafi','maliki','hanbali'].includes(madhab) ? madhab : 'shafii';
+
+  const madhhabZakatRules = MADHAB_ZAKAT_RULES[m];
+  const madhhabNotes = MADHAB_SPECIFIC_NOTES[m];
 
   try {
     const response = await client.messages.create({
       model: 'claude-opus-4-6',
-      max_tokens: 800,
-      system: getMadhhabPrompt(madhab || 'shafii'),
+      max_tokens: 1024,
+      system: SCREEN_SYSTEM,
       messages: [{
         role: 'user',
-        content: `Screen this investment for Sharia compliance according to the ${madhhabName} madhab: "${company}"
+        content: `Screen the investment "${company}" for Sharia compliance according to the ${madhhabName} madhab.
 
-Please respond in this exact JSON format:
+Madhab-specific context:
+${madhhabZakatRules}
+${madhhabNotes}
+
+Haram categories to check: alcohol, tobacco, pork, gambling, conventional banking/insurance (as primary business), adult entertainment, interest-based financial services, non-halal food production. Defence/weapons: flag as DOUBTFUL.
+
+Respond with ONLY this JSON object (no markdown fences, no extra text):
 {
-  "verdict": "HALAL" | "HARAM" | "DOUBTFUL" | "UNKNOWN",
-  "confidence": "HIGH" | "MEDIUM" | "LOW",
-  "summary": "One sentence verdict",
+  "verdict": "HALAL",
+  "confidence": "HIGH",
+  "summary": "one sentence verdict",
   "reasons": ["reason 1", "reason 2"],
-  "concerns": ["concern 1"] or [],
-  "madhab_note": "Any ruling that is specific to the ${madhhabName} madhab, or empty string",
-  "recommendation": "Short practical advice"
+  "concerns": [],
+  "madhab_note": "any ${madhhabName}-specific ruling difference, or empty string",
+  "recommendation": "practical advice for a UK Muslim investor"
 }
 
-Only respond with the JSON, no other text.`
+verdict must be exactly one of: HALAL, HARAM, DOUBTFUL, UNKNOWN
+confidence must be exactly one of: HIGH, MEDIUM, LOW`
       }]
     });
 
-    const text = response.content[0].text.trim();
+    const rawText = response.content[0].text;
+    console.log(`[screen] Raw response for "${company}":`, rawText.slice(0, 200));
+
+    const jsonText = extractJSON(rawText);
     try {
-      const result = JSON.parse(text);
+      const result = JSON.parse(jsonText);
+      // Validate verdict is a known value
+      const validVerdicts = ['HALAL', 'HARAM', 'DOUBTFUL', 'UNKNOWN'];
+      if (!validVerdicts.includes(result.verdict)) {
+        result.verdict = 'UNKNOWN';
+      }
       res.json(result);
-    } catch {
+    } catch (parseErr) {
+      console.error('[screen] JSON parse failed:', parseErr.message, '\nText was:', jsonText);
       res.json({
         verdict: 'UNKNOWN',
         confidence: 'LOW',
-        summary: 'Could not determine Sharia compliance',
-        reasons: ['Unable to parse response'],
+        summary: 'Could not parse screening result — please try again',
+        reasons: ['AI response could not be parsed'],
         concerns: [],
         madhab_note: '',
-        recommendation: 'Consult a qualified Islamic scholar for this investment'
+        recommendation: 'Please try again or consult a qualified Islamic scholar'
       });
     }
   } catch (err) {
-    console.error(err);
+    console.error('[screen] API error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
