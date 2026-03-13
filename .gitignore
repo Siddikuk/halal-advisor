@@ -4,7 +4,7 @@ node_modules/
 # Environment variables — NEVER commit your API key
 .env
 
-# SQLite database — contains user data
+# SQLite (no longer used — migrated to PostgreSQL)
 *.db
 *.db-shm
 *.db-wal

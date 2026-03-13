@@ -2,94 +2,47 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
-const Database = require('better-sqlite3');
+const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Stripe = require('stripe');
 
-const app = express();
+// ─────────────────────────────────────────────
+// DATABASE (PostgreSQL)
+// ─────────────────────────────────────────────
 
-// ── Stripe webhook must receive raw body — register BEFORE express.json() ──
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.error('[webhook] STRIPE_WEBHOOK_SECRET not set');
-    return res.status(500).send('Webhook secret not configured');
-  }
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    console.error('[webhook] Signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object;
-      if (session.mode === 'subscription') {
-        db.prepare('UPDATE users SET subscription_status = ?, stripe_subscription_id = ? WHERE stripe_customer_id = ?')
-          .run('active', session.subscription, session.customer);
-        console.log('[webhook] Subscription activated for customer', session.customer);
-      }
-      break;
-    }
-    case 'customer.subscription.updated': {
-      const sub = event.data.object;
-      const status = sub.status === 'active' ? 'active' : sub.status;
-      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
-        .run(status, sub.customer);
-      console.log('[webhook] Subscription updated:', status, 'for', sub.customer);
-      break;
-    }
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object;
-      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
-        .run('cancelled', sub.customer);
-      console.log('[webhook] Subscription cancelled for', sub.customer);
-      break;
-    }
-    case 'invoice.payment_failed': {
-      const invoice = event.data.object;
-      db.prepare('UPDATE users SET subscription_status = ? WHERE stripe_customer_id = ?')
-        .run('past_due', invoice.customer);
-      console.log('[webhook] Payment failed for', invoice.customer);
-      break;
-    }
-  }
-  res.json({ received: true });
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id                   SERIAL PRIMARY KEY,
+      email                TEXT UNIQUE NOT NULL,
+      password_hash        TEXT NOT NULL,
+      trial_start          BIGINT NOT NULL,
+      created_at           BIGINT NOT NULL,
+      subscription_status  TEXT DEFAULT 'trialing',
+      stripe_customer_id   TEXT,
+      stripe_subscription_id TEXT
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_data (
+      user_id    INTEGER NOT NULL REFERENCES users(id),
+      data_key   TEXT NOT NULL,
+      data_value TEXT NOT NULL,
+      updated_at BIGINT NOT NULL,
+      PRIMARY KEY (user_id, data_key)
+    )
+  `);
+}
 
 // ─────────────────────────────────────────────
-// DATABASE & AUTH
+// STRIPE & AUTH SETUP
 // ─────────────────────────────────────────────
-
-const db = new Database(path.join(__dirname, 'halal_advisor.db'));
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    email        TEXT    UNIQUE NOT NULL COLLATE NOCASE,
-    password_hash TEXT   NOT NULL,
-    trial_start  INTEGER NOT NULL,
-    created_at   INTEGER NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS user_data (
-    user_id    INTEGER NOT NULL,
-    data_key   TEXT    NOT NULL,
-    data_value TEXT    NOT NULL,
-    updated_at INTEGER NOT NULL,
-    PRIMARY KEY (user_id, data_key),
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  );
-`);
-// Migrate: add subscription columns if they don't exist yet
-['ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT "trialing"',
- 'ALTER TABLE users ADD COLUMN stripe_customer_id TEXT',
- 'ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT'
-].forEach(sql => { try { db.exec(sql); } catch {} });
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
@@ -113,6 +66,79 @@ function authMiddleware(req, res, next) {
   }
 }
 
+const app = express();
+
+// ── Stripe webhook must receive raw body — register BEFORE express.json() ──
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('[webhook] STRIPE_WEBHOOK_SECRET not set');
+    return res.status(500).send('Webhook secret not configured');
+  }
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('[webhook] Signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        if (session.mode === 'subscription') {
+          await pool.query(
+            'UPDATE users SET subscription_status = $1, stripe_subscription_id = $2 WHERE stripe_customer_id = $3',
+            ['active', session.subscription, session.customer]
+          );
+          console.log('[webhook] Subscription activated for customer', session.customer);
+        }
+        break;
+      }
+      case 'customer.subscription.updated': {
+        const sub = event.data.object;
+        const status = sub.status === 'active' ? 'active' : sub.status;
+        await pool.query(
+          'UPDATE users SET subscription_status = $1 WHERE stripe_customer_id = $2',
+          [status, sub.customer]
+        );
+        console.log('[webhook] Subscription updated:', status, 'for', sub.customer);
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        await pool.query(
+          'UPDATE users SET subscription_status = $1 WHERE stripe_customer_id = $2',
+          ['cancelled', sub.customer]
+        );
+        console.log('[webhook] Subscription cancelled for', sub.customer);
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        await pool.query(
+          'UPDATE users SET subscription_status = $1 WHERE stripe_customer_id = $2',
+          ['past_due', invoice.customer]
+        );
+        console.log('[webhook] Payment failed for', invoice.customer);
+        break;
+      }
+    }
+  } catch (err) {
+    console.error('[webhook] DB error:', err.message);
+  }
+
+  res.json({ received: true });
+});
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ─────────────────────────────────────────────
+// AUTH ROUTES
+// ─────────────────────────────────────────────
+
 // POST /api/auth/signup
 app.post('/api/auth/signup', async (req, res) => {
   const { email, password } = req.body;
@@ -122,13 +148,14 @@ app.post('/api/auth/signup', async (req, res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     const now = Date.now();
-    const result = db.prepare(
-      'INSERT INTO users (email, password_hash, trial_start, created_at) VALUES (?, ?, ?, ?)'
-    ).run(email.toLowerCase(), hash, now, now);
-    const token = jwt.sign({ userId: result.lastInsertRowid, email: email.toLowerCase() }, JWT_SECRET, { expiresIn: '30d' });
-    res.json({ token, email: email.toLowerCase(), trialDaysLeft: TRIAL_DAYS });
+    const result = await pool.query(
+      'INSERT INTO users (email, password_hash, trial_start, created_at) VALUES ($1, $2, $3, $4) RETURNING id',
+      [email.toLowerCase(), hash, now, now]
+    );
+    const token = jwt.sign({ userId: result.rows[0].id, email: email.toLowerCase() }, JWT_SECRET, { expiresIn: '30d' });
+    res.json({ token, email: email.toLowerCase(), trialDaysLeft: TRIAL_DAYS, subscriptionStatus: 'trialing' });
   } catch (err) {
-    if (err.message.includes('UNIQUE constraint')) return res.status(409).json({ error: 'This email is already registered. Please sign in.' });
+    if (err.code === '23505') return res.status(409).json({ error: 'This email is already registered. Please sign in.' });
     console.error('[signup]', err.message);
     res.status(500).json({ error: 'Registration failed. Please try again.' });
   }
@@ -138,47 +165,130 @@ app.post('/api/auth/signup', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required.' });
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
-  if (!user) return res.status(401).json({ error: 'Invalid email or password.' });
-  const valid = await bcrypt.compare(password, user.password_hash);
-  if (!valid) return res.status(401).json({ error: 'Invalid email or password.' });
-  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, email: user.email, trialDaysLeft: trialDaysLeft(user.trial_start) });
+  try {
+    const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
+    const user = rows[0];
+    if (!user) return res.status(401).json({ error: 'Invalid email or password.' });
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Invalid email or password.' });
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
+    const days = trialDaysLeft(Number(user.trial_start));
+    res.json({
+      token,
+      email: user.email,
+      trialDaysLeft: days,
+      subscriptionStatus: user.subscription_status || 'trialing'
+    });
+  } catch (err) {
+    console.error('[login]', err.message);
+    res.status(500).json({ error: 'Login failed. Please try again.' });
+  }
 });
 
 // GET /api/user/me
-app.get('/api/user/me', authMiddleware, (req, res) => {
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
-  if (!user) return res.status(404).json({ error: 'User not found.' });
-  const days = trialDaysLeft(user.trial_start);
-  const subscriptionStatus = user.subscription_status || 'trialing';
-  const hasAccess = days > 0 || subscriptionStatus === 'active';
-  res.json({
-    email: user.email,
-    trialDaysLeft: days,
-    subscriptionStatus,
-    hasAccess
-  });
-});
-
-// GET /api/user/data — load all user data keys
-app.get('/api/user/data', authMiddleware, (req, res) => {
-  const rows = db.prepare('SELECT data_key, data_value FROM user_data WHERE user_id = ?').all(req.user.userId);
-  const result = {};
-  for (const row of rows) {
-    try { result[row.data_key] = JSON.parse(row.data_value); } catch { result[row.data_key] = row.data_value; }
+app.get('/api/user/me', authMiddleware, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
+    const user = rows[0];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    const days = trialDaysLeft(Number(user.trial_start));
+    const subscriptionStatus = user.subscription_status || 'trialing';
+    const hasAccess = days > 0 || subscriptionStatus === 'active';
+    res.json({ email: user.email, trialDaysLeft: days, subscriptionStatus, hasAccess });
+  } catch (err) {
+    console.error('[me]', err.message);
+    res.status(500).json({ error: 'Server error.' });
   }
-  res.json(result);
 });
 
-// PUT /api/user/data — save one data key
-app.put('/api/user/data', authMiddleware, (req, res) => {
+// GET /api/user/data
+app.get('/api/user/data', authMiddleware, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT data_key, data_value FROM user_data WHERE user_id = $1',
+      [req.user.userId]
+    );
+    const result = {};
+    for (const row of rows) {
+      try { result[row.data_key] = JSON.parse(row.data_value); } catch { result[row.data_key] = row.data_value; }
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('[user/data GET]', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// PUT /api/user/data
+app.put('/api/user/data', authMiddleware, async (req, res) => {
   const { key, value } = req.body;
   if (!key) return res.status(400).json({ error: 'Data key required.' });
-  db.prepare(
-    'INSERT OR REPLACE INTO user_data (user_id, data_key, data_value, updated_at) VALUES (?, ?, ?, ?)'
-  ).run(req.user.userId, key, JSON.stringify(value), Date.now());
-  res.json({ ok: true });
+  try {
+    await pool.query(
+      `INSERT INTO user_data (user_id, data_key, data_value, updated_at)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (user_id, data_key)
+       DO UPDATE SET data_value = EXCLUDED.data_value, updated_at = EXCLUDED.updated_at`,
+      [req.user.userId, key, JSON.stringify(value), Date.now()]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[user/data PUT]', err.message);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// STRIPE PAYMENTS
+// ─────────────────────────────────────────────
+
+// POST /api/stripe/create-checkout-session
+app.post('/api/stripe/create-checkout-session', authMiddleware, async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to your environment.' });
+  if (!process.env.STRIPE_PRICE_ID) return res.status(500).json({ error: 'STRIPE_PRICE_ID not configured.' });
+  try {
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
+    const user = rows[0];
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    let customerId = user.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: user.email });
+      customerId = customer.id;
+      await pool.query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customerId, user.id]);
+    }
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${appUrl}/?subscribed=1`,
+      cancel_url: `${appUrl}/`,
+      allow_promotion_codes: true,
+      subscription_data: { metadata: { userId: String(user.id) } }
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('[stripe] Checkout session error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/stripe/portal
+app.post('/api/stripe/portal', authMiddleware, async (req, res) => {
+  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured.' });
+  try {
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
+    const user = rows[0];
+    if (!user.stripe_customer_id) return res.status(400).json({ error: 'No subscription found for this account.' });
+    const session = await stripe.billingPortal.sessions.create({
+      customer: user.stripe_customer_id,
+      return_url: process.env.APP_URL || 'http://localhost:3000'
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('[stripe] Portal error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ─────────────────────────────────────────────
@@ -344,81 +454,13 @@ RESPONSE GUIDELINES
 - Be concise but thorough`;
 }
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-});
-
-// ─────────────────────────────────────────────
-// STRIPE PAYMENTS
-// ─────────────────────────────────────────────
-
-// POST /api/stripe/create-checkout-session
-app.post('/api/stripe/create-checkout-session', authMiddleware, async (req, res) => {
-  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to your environment.' });
-  if (!process.env.STRIPE_PRICE_ID) return res.status(500).json({ error: 'STRIPE_PRICE_ID not configured.' });
-
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
-  const appUrl = process.env.APP_URL || 'http://localhost:3000';
-
-  try {
-    // Create or reuse Stripe customer
-    let customerId = user.stripe_customer_id;
-    if (!customerId) {
-      const customer = await stripe.customers.create({ email: user.email });
-      customerId = customer.id;
-      db.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').run(customerId, user.id);
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ['card'],
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      mode: 'subscription',
-      success_url: `${appUrl}/?subscribed=1`,
-      cancel_url: `${appUrl}/`,
-      allow_promotion_codes: true,
-      subscription_data: {
-        metadata: { userId: String(user.id) }
-      }
-    });
-
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error('[stripe] Checkout session error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/stripe/portal — customer billing portal (manage/cancel subscription)
-app.post('/api/stripe/portal', authMiddleware, async (req, res) => {
-  if (!stripe) return res.status(500).json({ error: 'Stripe is not configured.' });
-
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.userId);
-  if (!user.stripe_customer_id) return res.status(400).json({ error: 'No subscription found for this account.' });
-
-  try {
-    const session = await stripe.billingPortal.sessions.create({
-      customer: user.stripe_customer_id,
-      return_url: process.env.APP_URL || 'http://localhost:3000'
-    });
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error('[stripe] Portal error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Chat endpoint with streaming
 app.post('/api/chat', authMiddleware, async (req, res) => {
   const { messages, madhab } = req.body;
-
-  if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ error: 'Invalid messages format' });
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: 'API key not configured. Please add your key to the .env file.' });
-  }
+  if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: 'Invalid messages format' });
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'API key not configured.' });
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -430,15 +472,13 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
       model: 'claude-opus-4-6',
       max_tokens: 2048,
       system: getMadhhabPrompt(madhab || 'shafii'),
-      messages: messages
+      messages
     });
-
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
         res.write(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`);
       }
     }
-
     res.write('data: [DONE]\n\n');
     res.end();
   } catch (err) {
@@ -450,10 +490,8 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
 
 // Extract JSON from a string that may be wrapped in markdown code fences
 function extractJSON(text) {
-  // Strip ```json ... ``` or ``` ... ``` fences
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenced) return fenced[1].trim();
-  // Fall back to finding the first { ... } block
   const braceMatch = text.match(/\{[\s\S]*\}/);
   if (braceMatch) return braceMatch[0].trim();
   return text.trim();
@@ -464,14 +502,10 @@ const SCREEN_SYSTEM = `You are a Sharia compliance analyst. You respond ONLY wit
 // Investment screening endpoint
 app.post('/api/screen', authMiddleware, async (req, res) => {
   const { company, madhab } = req.body;
-
   if (!company) return res.status(400).json({ error: 'Company name required' });
 
   const madhhabName = MADHAB_NAMES[madhab] || MADHAB_NAMES['shafii'];
   const m = ['shafii','hanafi','maliki','hanbali'].includes(madhab) ? madhab : 'shafii';
-
-  const madhhabZakatRules = MADHAB_ZAKAT_RULES[m];
-  const madhhabNotes = MADHAB_SPECIFIC_NOTES[m];
 
   try {
     const response = await client.messages.create({
@@ -483,8 +517,8 @@ app.post('/api/screen', authMiddleware, async (req, res) => {
         content: `Screen the investment "${company}" for Sharia compliance according to the ${madhhabName} madhab.
 
 Madhab-specific context:
-${madhhabZakatRules}
-${madhhabNotes}
+${MADHAB_ZAKAT_RULES[m]}
+${MADHAB_SPECIFIC_NOTES[m]}
 
 Haram categories to check: alcohol, tobacco, pork, gambling, conventional banking/insurance (as primary business), adult entertainment, interest-based financial services, non-halal food production. Defence/weapons: flag as DOUBTFUL.
 
@@ -510,23 +544,12 @@ confidence must be exactly one of: HIGH, MEDIUM, LOW`
     const jsonText = extractJSON(rawText);
     try {
       const result = JSON.parse(jsonText);
-      // Validate verdict is a known value
       const validVerdicts = ['HALAL', 'HARAM', 'DOUBTFUL', 'UNKNOWN'];
-      if (!validVerdicts.includes(result.verdict)) {
-        result.verdict = 'UNKNOWN';
-      }
+      if (!validVerdicts.includes(result.verdict)) result.verdict = 'UNKNOWN';
       res.json(result);
     } catch (parseErr) {
-      console.error('[screen] JSON parse failed:', parseErr.message, '\nText was:', jsonText);
-      res.json({
-        verdict: 'UNKNOWN',
-        confidence: 'LOW',
-        summary: 'Could not parse screening result — please try again',
-        reasons: ['AI response could not be parsed'],
-        concerns: [],
-        madhab_note: '',
-        recommendation: 'Please try again or consult a qualified Islamic scholar'
-      });
+      console.error('[screen] JSON parse failed:', parseErr.message);
+      res.json({ verdict: 'UNKNOWN', confidence: 'LOW', summary: 'Could not parse screening result — please try again', reasons: ['AI response could not be parsed'], concerns: [], madhab_note: '', recommendation: 'Please try again or consult a qualified Islamic scholar' });
     }
   } catch (err) {
     console.error('[screen] API error:', err.message);
@@ -534,14 +557,25 @@ confidence must be exactly one of: HIGH, MEDIUM, LOW`
   }
 });
 
+// ─────────────────────────────────────────────
+// START SERVER
+// ─────────────────────────────────────────────
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log('');
-  console.log('╔════════════════════════════════════════╗');
-  console.log('║   Halal Financial Advisor - Running    ║');
-  console.log(`║   Open: http://localhost:${PORT}           ║`);
-  console.log('║   Madhabs: Shafi\'i · Hanafi · Maliki   ║');
-  console.log('║            · Hanbali | Currency: GBP   ║');
-  console.log('╚════════════════════════════════════════╝');
-  console.log('');
-});
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log('');
+      console.log('╔════════════════════════════════════════╗');
+      console.log('║   Halal Financial Advisor - Running    ║');
+      console.log(`║   Open: http://localhost:${PORT}           ║`);
+      console.log('║   Madhabs: Shafi\'i · Hanafi · Maliki   ║');
+      console.log('║            · Hanbali | Currency: GBP   ║');
+      console.log('╚════════════════════════════════════════╝');
+      console.log('');
+    });
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1);
+  });
