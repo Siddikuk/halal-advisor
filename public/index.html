@@ -238,22 +238,22 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
       <div class="stat-card">
-        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Total Assets</p>
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;" data-i18n="dash_total_assets">Total Assets</p>
         <p id="dash-assets" style="font-size:1.8rem;font-weight:700;color:var(--green);margin-top:4px;">£0</p>
-        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Halal wealth</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;" data-i18n="dash_halal_wealth">Halal wealth</p>
       </div>
       <div class="stat-card gold">
-        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">This Month: Income</p>
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;" data-i18n="dash_month_income">This Month: Income</p>
         <p id="dash-income" style="font-size:1.8rem;font-weight:700;color:var(--gold);margin-top:4px;">£0</p>
-        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Halal earnings</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;" data-i18n="dash_halal_earnings">Halal earnings</p>
       </div>
       <div class="stat-card red">
-        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">This Month: Expenses</p>
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;" data-i18n="dash_month_expenses">This Month: Expenses</p>
         <p id="dash-expenses" style="font-size:1.8rem;font-weight:700;color:#e53e3e;margin-top:4px;">£0</p>
-        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;">Total spending</p>
+        <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;" data-i18n="dash_total_spending">Total spending</p>
       </div>
       <div class="stat-card blue">
-        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Zakat Status</p>
+        <p style="font-size:.78rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.05em;" data-i18n="dash_zakat_status">Zakat Status</p>
         <p id="dash-zakat" style="font-size:1.1rem;font-weight:700;color:#3182ce;margin-top:6px;">Calculate →</p>
         <p style="font-size:.78rem;color:#a0aec0;margin-top:2px;"><span id="dash-madhab-nisab">Nisab</span></p>
       </div>
@@ -261,20 +261,20 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
       <div class="card">
         <h3 style="font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-          <span style="background:var(--green-pale);color:var(--green);padding:4px 8px;border-radius:6px;font-size:.78rem;">QUICK ADD</span>Log Transaction
+          <span style="background:var(--green-pale);color:var(--green);padding:4px 8px;border-radius:6px;font-size:.78rem;">QUICK ADD</span><span data-i18n="lbl_log_txn">Log Transaction</span>
         </h3>
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <div><label class="label">Description</label><input class="input" id="quick-desc" placeholder="e.g. Salary, Groceries..."/></div>
+          <div><label class="label" data-i18n="lbl_description">Description</label><input class="input" id="quick-desc" placeholder="e.g. Salary, Groceries..."/></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div><label class="label">Amount (£)</label><input class="input" id="quick-amount" type="number" placeholder="0.00"/></div>
-            <div><label class="label">Type</label>
+            <div><label class="label" data-i18n="lbl_amount_gbp">Amount (£)</label><input class="input" id="quick-amount" type="number" placeholder="0.00"/></div>
+            <div><label class="label" data-i18n="lbl_type">Type</label>
               <select class="input" id="quick-type">
-                <option value="income">Income ↑</option>
-                <option value="expense">Expense ↓</option>
+                <option value="income" data-i18n="opt_income">Income ↑</option>
+                <option value="expense" data-i18n="opt_expense">Expense ↓</option>
               </select>
             </div>
           </div>
-          <div><label class="label">Category</label>
+          <div><label class="label" data-i18n="lbl_category">Category</label>
             <select class="input" id="quick-cat">
               <optgroup label="✅ Halal Income">
                 <option value="salary">Salary / Wages</option>
@@ -301,11 +301,11 @@
               </optgroup>
             </select>
           </div>
-          <button class="btn-primary" onclick="quickAddTransaction()">Add Transaction</button>
+          <button class="btn-primary" onclick="quickAddTransaction()" data-i18n="btn_add_txn">Add Transaction</button>
         </div>
       </div>
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;">Recent Transactions</h3>
+        <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="lbl_recent_txns">Recent Transactions</h3>
         <div id="recent-txns" style="max-height:280px;overflow-y:auto;">
           <p style="color:#a0aec0;font-size:.85rem;text-align:center;margin-top:40px;">No transactions yet.</p>
         </div>
@@ -319,20 +319,20 @@
 
   <!-- ═══ BUDGET ═══ -->
   <section id="sec-budget" class="hidden">
-    <div class="section-title">Budget Tracker</div>
-    <p class="section-sub">Track halal income and expenses. Haram items are automatically flagged.</p>
+    <div class="section-title" data-i18n="nav_budget">Budget Tracker</div>
+    <p class="section-sub" data-i18n="budget_sub">Track halal income and expenses. Haram items are automatically flagged.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
-      <div class="stat-card"><p style="font-size:.78rem;color:#718096;font-weight:600;">TOTAL INCOME</p><p id="budget-total-income" style="font-size:1.6rem;font-weight:700;color:var(--green);margin-top:4px;">£0.00</p></div>
-      <div class="stat-card red"><p style="font-size:.78rem;color:#718096;font-weight:600;">TOTAL EXPENSES</p><p id="budget-total-expense" style="font-size:1.6rem;font-weight:700;color:#e53e3e;margin-top:4px;">£0.00</p></div>
-      <div class="stat-card blue"><p style="font-size:.78rem;color:#718096;font-weight:600;">NET BALANCE</p><p id="budget-net" style="font-size:1.6rem;font-weight:700;color:#3182ce;margin-top:4px;">£0.00</p></div>
+      <div class="stat-card"><p style="font-size:.78rem;color:#718096;font-weight:600;" data-i18n="lbl_total_income">TOTAL INCOME</p><p id="budget-total-income" style="font-size:1.6rem;font-weight:700;color:var(--green);margin-top:4px;">£0.00</p></div>
+      <div class="stat-card red"><p style="font-size:.78rem;color:#718096;font-weight:600;" data-i18n="lbl_total_expenses">TOTAL EXPENSES</p><p id="budget-total-expense" style="font-size:1.6rem;font-weight:700;color:#e53e3e;margin-top:4px;">£0.00</p></div>
+      <div class="stat-card blue"><p style="font-size:.78rem;color:#718096;font-weight:600;" data-i18n="lbl_net_balance">NET BALANCE</p><p id="budget-net" style="font-size:1.6rem;font-weight:700;color:#3182ce;margin-top:4px;">£0.00</p></div>
     </div>
     <div class="card" style="margin-bottom:20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <button onclick="filterTxns('all')" id="filter-all" class="btn-primary" style="font-size:.82rem;padding:7px 14px;">All</button>
-        <button onclick="filterTxns('income')" id="filter-income" class="btn-outline" style="font-size:.82rem;padding:7px 14px;">Income</button>
-        <button onclick="filterTxns('expense')" id="filter-expense" class="btn-outline" style="font-size:.82rem;padding:7px 14px;">Expenses</button>
-        <button onclick="filterTxns('haram')" id="filter-haram" class="btn-outline" style="font-size:.82rem;padding:7px 14px;color:#e53e3e;border-color:#e53e3e;">⚠️ Flagged</button>
-        <div style="margin-left:auto;"><button onclick="clearAllTransactions()" style="background:none;border:none;color:#a0aec0;font-size:.8rem;cursor:pointer;">Clear All</button></div>
+        <button onclick="filterTxns('all')" id="filter-all" class="btn-primary" style="font-size:.82rem;padding:7px 14px;" data-i18n="btn_all">All</button>
+        <button onclick="filterTxns('income')" id="filter-income" class="btn-outline" style="font-size:.82rem;padding:7px 14px;" data-i18n="btn_income_filter">Income</button>
+        <button onclick="filterTxns('expense')" id="filter-expense" class="btn-outline" style="font-size:.82rem;padding:7px 14px;" data-i18n="btn_expenses_filter">Expenses</button>
+        <button onclick="filterTxns('haram')" id="filter-haram" class="btn-outline" style="font-size:.82rem;padding:7px 14px;color:#e53e3e;border-color:#e53e3e;" data-i18n="btn_flagged">⚠️ Flagged</button>
+        <div style="margin-left:auto;"><button onclick="clearAllTransactions()" style="background:none;border:none;color:#a0aec0;font-size:.8rem;cursor:pointer;" data-i18n="btn_clear_all">Clear All</button></div>
       </div>
     </div>
     <div class="card"><div id="budget-txn-list"><p style="color:#a0aec0;text-align:center;padding:40px;font-size:.88rem;">No transactions. Add one from the Dashboard.</p></div></div>
@@ -340,7 +340,7 @@
 
   <!-- ═══ ZAKAT ═══ -->
   <section id="sec-zakat" class="hidden">
-    <div class="section-title">Zakat Calculator</div>
+    <div class="section-title" data-i18n="nav_zakat">Zakat Calculator</div>
     <p class="section-sub" id="zakat-sub-text">Calculating according to your selected madhab.</p>
 
     <!-- Madhab banner -->
@@ -348,34 +348,34 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Your Zakatable Assets</h3>
+        <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);" data-i18n="zakat_assets_title">Your Zakatable Assets</h3>
         <div style="background:var(--green-pale);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:var(--green);" id="nisab-info-box">
           Nisab: £<span id="nisab-display">6,375</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;">
-          <div><label class="label">💷 Cash & Halal Bank Savings (£)</label>
+          <div><label class="label" data-i18n="lbl_cash_savings">💷 Cash & Halal Bank Savings (£)</label>
             <input class="input" id="z-cash" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
             <p style="font-size:.75rem;color:#718096;margin-top:3px;">Islamic savings only. For interest accounts: enter principal only, plan to donate any interest received.</p>
           </div>
-          <div><label class="label">📈 Halal Investments / Shares (£)</label>
+          <div><label class="label" data-i18n="lbl_halal_invest">📈 Halal Investments / Shares (£)</label>
             <input class="input" id="z-invest" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
           </div>
-          <div><label class="label">🥇 Gold (grams)</label>
+          <div><label class="label" data-i18n="lbl_gold_grams">🥇 Gold (grams)</label>
             <input class="input" id="z-gold-grams" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
             <p id="gold-jewelry-note" style="font-size:.75rem;color:#718096;margin-top:3px;"></p>
           </div>
-          <div><label class="label">⬜ Silver (grams)</label>
+          <div><label class="label" data-i18n="lbl_silver_grams">⬜ Silver (grams)</label>
             <input class="input" id="z-silver-grams" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
           </div>
-          <div><label class="label">🏭 Business Inventory / Trade Goods (£)</label>
+          <div><label class="label" data-i18n="lbl_biz_inventory">🏭 Business Inventory / Trade Goods (£)</label>
             <input class="input" id="z-business" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
           </div>
-          <div><label class="label">💰 Receivables / Money Owed to You (£)</label>
+          <div><label class="label" data-i18n="lbl_receivables">💰 Receivables / Money Owed to You (£)</label>
             <input class="input" id="z-receivables" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
           </div>
           <!-- Debt deduction — shown for Hanafi, Maliki, Hanbali -->
           <div id="z-debt-section">
-            <label class="label">➖ Deductible Debts (£) <span id="debt-deduct-label" style="color:#718096;font-weight:400;font-size:.78rem;"></span></label>
+            <label class="label"><span data-i18n="lbl_deduct_debts">➖ Deductible Debts (£)</span> <span id="debt-deduct-label" style="color:#718096;font-weight:400;font-size:.78rem;"></span></label>
             <input class="input" id="z-debts" type="number" placeholder="0" oninput="calculateZakat()" value="0"/>
             <p id="debt-deduct-note" style="font-size:.75rem;color:#718096;margin-top:3px;"></p>
           </div>
@@ -384,41 +384,41 @@
 
       <div>
         <div class="card" style="margin-bottom:16px;">
-          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Zakat Result</h3>
+          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);" data-i18n="zakat_result_title">Zakat Result</h3>
           <div id="zakat-result-card" class="nisab-below"><p style="font-weight:600;font-size:1.1rem;">Enter your assets to calculate</p></div>
           <div style="margin-top:20px;">
             <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
-              <span style="color:#718096;">Gross Zakatable Wealth</span><span id="z-gross-display" style="font-weight:700;">£0</span>
+              <span style="color:#718096;" data-i18n="lbl_gross_wealth">Gross Zakatable Wealth</span><span id="z-gross-display" style="font-weight:700;">£0</span>
             </div>
             <div id="z-debt-deduct-line" style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;" class="hidden">
-              <span style="color:#718096;">Less: Deductible Debts</span><span id="z-debt-deduct-val" style="font-weight:700;color:#e53e3e;">-£0</span>
+              <span style="color:#718096;" data-i18n="lbl_less_debts">Less: Deductible Debts</span><span id="z-debt-deduct-val" style="font-weight:700;color:#e53e3e;">-£0</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
-              <span style="color:#718096;">Net Zakatable Wealth</span><span id="z-total-display" style="font-weight:700;">£0</span>
+              <span style="color:#718096;" data-i18n="lbl_net_wealth">Net Zakatable Wealth</span><span id="z-total-display" style="font-weight:700;">£0</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;">
-              <span style="color:#718096;" id="nisab-label-line">Nisab Threshold</span>
+              <span style="color:#718096;" id="nisab-label-line" data-i18n="lbl_nisab_threshold">Nisab Threshold</span>
               <span id="z-nisab-line" style="font-weight:700;color:var(--green);">£6,375</span>
             </div>
             <div class="zakat-bar" style="margin:12px 0;"><div class="zakat-fill" id="zakat-progress" style="width:0%"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px;">
-              <span style="color:#718096;">Zakat Rate</span><span style="font-weight:700;">2.5%</span>
+              <span style="color:#718096;" data-i18n="lbl_zakat_rate">Zakat Rate</span><span style="font-weight:700;">2.5%</span>
             </div>
             <div style="border-top:2px solid var(--green-pale);margin:12px 0;padding-top:12px;display:flex;justify-content:space-between;">
-              <span style="font-weight:700;font-size:1rem;">Zakat Due</span>
+              <span style="font-weight:700;font-size:1rem;" data-i18n="lbl_zakat_due">Zakat Due</span>
               <span id="z-due-display" style="font-weight:800;font-size:1.3rem;color:var(--green);">£0.00</span>
             </div>
           </div>
         </div>
         <div class="card">
-          <h3 style="font-weight:700;margin-bottom:12px;">Zakat al-Fitr (Fitrana)</h3>
+          <h3 style="font-weight:700;margin-bottom:12px;" data-i18n="fitrana_title">Zakat al-Fitr (Fitrana)</h3>
           <p style="font-size:.85rem;color:#718096;margin-bottom:12px;">Obligatory charity before Eid al-Fitr prayer. ~£5–10 per person in UK.</p>
           <div style="display:flex;gap:12px;">
-            <div style="flex:1;"><label class="label">Household members</label><input class="input" id="z-fitrana-people" type="number" placeholder="1" min="1" value="1" oninput="calcFitrana()"/></div>
-            <div style="flex:1;"><label class="label">Per person (£)</label><input class="input" id="z-fitrana-amount" type="number" placeholder="7" value="7" oninput="calcFitrana()"/></div>
+            <div style="flex:1;"><label class="label" data-i18n="lbl_household">Household members</label><input class="input" id="z-fitrana-people" type="number" placeholder="1" min="1" value="1" oninput="calcFitrana()"/></div>
+            <div style="flex:1;"><label class="label" data-i18n="lbl_per_person">Per person (£)</label><input class="input" id="z-fitrana-amount" type="number" placeholder="7" value="7" oninput="calcFitrana()"/></div>
           </div>
           <div style="margin-top:12px;background:var(--green-pale);border-radius:8px;padding:12px;display:flex;justify-content:space-between;">
-            <span style="font-weight:600;color:var(--green);">Total Zakat al-Fitr</span>
+            <span style="font-weight:600;color:var(--green);" data-i18n="lbl_total_fitrana">Total Zakat al-Fitr</span>
             <span id="z-fitrana-total" style="font-weight:800;color:var(--green);font-size:1.1rem;">£7.00</span>
           </div>
         </div>
@@ -428,19 +428,19 @@
 
   <!-- ═══ INVESTMENTS ═══ -->
   <section id="sec-investments" class="hidden">
-    <div class="section-title">Investment Screener</div>
-    <p class="section-sub">Check if a company or fund is Sharia-compliant. AI applies your <strong id="screen-madhab-label">Shafi'i</strong> madhab's rulings.</p>
+    <div class="section-title" data-i18n="nav_investments">Investment Screener</div>
+    <p class="section-sub"><span data-i18n="invest_sub">Check if a company or fund is Sharia-compliant.</span> AI applies your <strong id="screen-madhab-label">Shafi'i</strong> madhab's rulings.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;">Screen an Investment</h3>
-        <div style="margin-bottom:12px;"><label class="label">Company / Fund / ETF Name</label>
+        <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="screen_invest_title">Screen an Investment</h3>
+        <div style="margin-bottom:12px;"><label class="label" data-i18n="lbl_company_name">Company / Fund / ETF Name</label>
           <input class="input" id="screen-input" placeholder="e.g. Apple, Vanguard S&P 500, BP..."/>
         </div>
-        <button class="btn-primary" onclick="screenInvestment()" id="screen-btn" style="width:100%;">Screen for Halal Compliance</button>
+        <button class="btn-primary" onclick="screenInvestment()" id="screen-btn" style="width:100%;" data-i18n="btn_screen_halal">Screen for Halal Compliance</button>
         <div id="screen-result" style="margin-top:16px;"></div>
       </div>
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;">Sharia Screening Criteria</h3>
+        <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="criteria_title">Sharia Screening Criteria</h3>
         <div style="display:flex;flex-direction:column;gap:10px;font-size:.85rem;">
           <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Alcohol, Tobacco, Pork</strong> — Any production/distribution</div></div>
           <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#e53e3e;">✗</span><div><strong>Gambling & Lotteries</strong> — Casinos, betting</div></div>
@@ -454,8 +454,8 @@
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h3 style="font-weight:700;">Screening History</h3>
-        <button onclick="clearScreenings()" style="font-size:.8rem;color:#a0aec0;background:none;border:none;cursor:pointer;">Clear</button>
+        <h3 style="font-weight:700;" data-i18n="screen_history">Screening History</h3>
+        <button onclick="clearScreenings()" style="font-size:.8rem;color:#a0aec0;background:none;border:none;cursor:pointer;" data-i18n="btn_clear">Clear</button>
       </div>
       <div id="screening-history"><p style="color:#a0aec0;text-align:center;padding:20px;font-size:.85rem;">No screenings yet.</p></div>
     </div>
@@ -463,8 +463,8 @@
 
   <!-- ═══ AI CHAT ═══ -->
   <section id="sec-chat" class="hidden">
-    <div class="section-title">Amin — Your AI Halal Financial Advisor</div>
-    <p class="section-sub">Ask anything about halal finance. Amin applies your <strong id="chat-madhab-label">Shafi'i</strong> madhab's rulings automatically.</p>
+    <div class="section-title" data-i18n="chat_page_title">Amin — Your AI Halal Financial Advisor</div>
+    <p class="section-sub"><span data-i18n="chat_sub">Ask anything about halal finance.</span> Amin applies your <strong id="chat-madhab-label">Shafi'i</strong> madhab's rulings automatically.</p>
     <div class="card" style="max-width:800px;">
       <div style="border-bottom:1px solid #f0f0f0;padding-bottom:12px;margin-bottom:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;">☽</div>
@@ -493,22 +493,22 @@
           <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         </button>
       </div>
-      <p style="font-size:.72rem;color:#a0aec0;margin-top:8px;text-align:center;">For personal fatwas, always consult a qualified Islamic scholar (mufti). This is guidance only.</p>
+      <p style="font-size:.72rem;color:#a0aec0;margin-top:8px;text-align:center;" data-i18n="chat_disclaimer">For personal fatwas, always consult a qualified Islamic scholar (mufti). This is guidance only.</p>
     </div>
   </section>
 
   <!-- ═══ DEBTS ═══ -->
   <section id="sec-debts" class="hidden">
-    <div class="section-title">Debt Tracker</div>
-    <p class="section-sub">Track your debts. Interest-bearing debts are flagged — seek halal alternatives immediately.</p>
+    <div class="section-title" data-i18n="nav_debts">Debt Tracker</div>
+    <p class="section-sub" data-i18n="debt_sub">Track your debts. Interest-bearing debts are flagged — seek halal alternatives immediately.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;">Add a Debt</h3>
+        <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="add_debt_title">Add a Debt</h3>
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <div><label class="label">Description</label><input class="input" id="debt-desc" placeholder="e.g. Student loan, Car finance..."/></div>
+          <div><label class="label" data-i18n="lbl_description">Description</label><input class="input" id="debt-desc" placeholder="e.g. Student loan, Car finance..."/></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div><label class="label">Amount Owed (£)</label><input class="input" id="debt-amount" type="number" placeholder="0"/></div>
-            <div><label class="label">Type</label>
+            <div><label class="label" data-i18n="lbl_amount_owed">Amount Owed (£)</label><input class="input" id="debt-amount" type="number" placeholder="0"/></div>
+            <div><label class="label" data-i18n="lbl_type">Type</label>
               <select class="input" id="debt-type">
                 <option value="halal">✅ Interest-Free (Halal)</option>
                 <option value="riba">⚠️ Interest-Bearing (RIBA)</option>
@@ -516,16 +516,16 @@
               </select>
             </div>
           </div>
-          <div><label class="label">Creditor / Lender</label><input class="input" id="debt-creditor" placeholder="Bank name, person..."/></div>
-          <button class="btn-primary" onclick="addDebt()">Add Debt</button>
+          <div><label class="label" data-i18n="lbl_creditor">Creditor / Lender</label><input class="input" id="debt-creditor" placeholder="Bank name, person..."/></div>
+          <button class="btn-primary" onclick="addDebt()" data-i18n="btn_add_debt">Add Debt</button>
         </div>
       </div>
       <div class="card">
-        <h3 style="font-weight:700;margin-bottom:16px;">Debt Summary</h3>
+        <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="debt_summary_title">Debt Summary</h3>
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;justify-content:space-between;padding:12px;background:var(--green-pale);border-radius:8px;"><span style="color:var(--green);font-weight:600;">Total Debt</span><span id="total-debt" style="font-weight:800;color:var(--green);font-size:1.2rem;">£0.00</span></div>
-          <div style="display:flex;justify-content:space-between;padding:12px;background:#fee2e2;border-radius:8px;"><span style="color:#991b1b;font-weight:600;">⚠️ Interest-Bearing (HARAM)</span><span id="riba-debt" style="font-weight:800;color:#991b1b;font-size:1.2rem;">£0.00</span></div>
-          <div style="display:flex;justify-content:space-between;padding:12px;background:#d1fae5;border-radius:8px;"><span style="color:#065f46;font-weight:600;">✅ Interest-Free (Halal)</span><span id="halal-debt" style="font-weight:800;color:#065f46;font-size:1.2rem;">£0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;background:var(--green-pale);border-radius:8px;"><span style="color:var(--green);font-weight:600;" data-i18n="lbl_total_debt">Total Debt</span><span id="total-debt" style="font-weight:800;color:var(--green);font-size:1.2rem;">£0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;background:#fee2e2;border-radius:8px;"><span style="color:#991b1b;font-weight:600;" data-i18n="lbl_riba_debt">⚠️ Interest-Bearing (HARAM)</span><span id="riba-debt" style="font-weight:800;color:#991b1b;font-size:1.2rem;">£0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px;background:#d1fae5;border-radius:8px;"><span style="color:#065f46;font-weight:600;" data-i18n="lbl_halal_debt">✅ Interest-Free (Halal)</span><span id="halal-debt" style="font-weight:800;color:#065f46;font-size:1.2rem;">£0.00</span></div>
         </div>
         <div id="riba-warning" class="hidden" style="margin-top:12px;background:#fff8f0;border:1px solid #fed7aa;border-radius:8px;padding:12px;font-size:.82rem;color:#7c2d12;">
           <strong>⚠️ Riba Alert!</strong> You have interest-bearing debts. Please seek halal alternatives:<br>
@@ -535,7 +535,7 @@
       </div>
     </div>
     <div class="card">
-      <h3 style="font-weight:700;margin-bottom:16px;">Your Debts</h3>
+      <h3 style="font-weight:700;margin-bottom:16px;" data-i18n="your_debts_title">Your Debts</h3>
       <div id="debt-list"><p style="color:#a0aec0;text-align:center;padding:30px;font-size:.85rem;">No debts recorded. Alhamdulillah! 🤲</p></div>
     </div>
   </section>
@@ -1548,7 +1548,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Gold Price (£ per gram)', lbl_silver_price:'Silver Price (£ per gram)',
     btn_save_settings:'Save All Settings', msg_settings_saved:'✓ Settings saved!',
     lbl_subscription:'Subscription', btn_manage_sub:'Manage Subscription',
-    btn_upgrade:'Upgrade — £4.99/month', settings_sub:'Configure your madhab, name, and gold/silver prices for accurate calculations.'
+    btn_upgrade:'Upgrade — £4.99/month', settings_sub:'Configure your madhab, name, and gold/silver prices for accurate calculations.',
+    dash_total_assets:'Total Assets', dash_halal_wealth:'Halal wealth', dash_month_income:'This Month: Income',
+    dash_halal_earnings:'Halal earnings', dash_month_expenses:'This Month: Expenses', dash_total_spending:'Total spending',
+    dash_zakat_status:'Zakat Status', btn_calculate:'Calculate →', lbl_log_txn:'Log Transaction',
+    lbl_description:'Description', lbl_amount_gbp:'Amount (£)', lbl_type:'Type', lbl_category:'Category',
+    opt_income:'Income ↑', opt_expense:'Expense ↓', btn_add_txn:'Add Transaction', lbl_recent_txns:'Recent Transactions',
+    budget_sub:'Track halal income and expenses. Haram items are automatically flagged.',
+    lbl_total_income:'TOTAL INCOME', lbl_total_expenses:'TOTAL EXPENSES', lbl_net_balance:'NET BALANCE',
+    btn_all:'All', btn_income_filter:'Income', btn_expenses_filter:'Expenses', btn_flagged:'⚠️ Flagged', btn_clear_all:'Clear All',
+    zakat_assets_title:'Your Zakatable Assets', lbl_cash_savings:'💷 Cash & Halal Bank Savings (£)',
+    lbl_halal_invest:'📈 Halal Investments / Shares (£)', lbl_gold_grams:'🥇 Gold (grams)', lbl_silver_grams:'⬜ Silver (grams)',
+    lbl_biz_inventory:'🏭 Business Inventory / Trade Goods (£)', lbl_receivables:'💰 Receivables / Money Owed to You (£)',
+    lbl_deduct_debts:'➖ Deductible Debts (£)', zakat_result_title:'Zakat Result',
+    lbl_gross_wealth:'Gross Zakatable Wealth', lbl_less_debts:'Less: Deductible Debts',
+    lbl_net_wealth:'Net Zakatable Wealth', lbl_nisab_threshold:'Nisab Threshold', lbl_zakat_rate:'Zakat Rate', lbl_zakat_due:'Zakat Due',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Household members', lbl_per_person:'Per person (£)', lbl_total_fitrana:'Total Zakat al-Fitr',
+    invest_sub:'Check if a company or fund is Sharia-compliant.', screen_invest_title:'Screen an Investment',
+    lbl_company_name:'Company / Fund / ETF Name', btn_screen_halal:'Screen for Halal Compliance',
+    criteria_title:'Sharia Screening Criteria', screen_history:'Screening History', btn_clear:'Clear',
+    chat_page_title:'Amin — Your AI Halal Financial Advisor', chat_sub:'Ask anything about halal finance.',
+    chat_disclaimer:'For personal fatwas, always consult a qualified Islamic scholar. This is guidance only.',
+    debt_sub:'Track your debts. Interest-bearing debts are flagged — seek halal alternatives.',
+    add_debt_title:'Add a Debt', lbl_amount_owed:'Amount Owed (£)', lbl_creditor:'Creditor / Lender',
+    btn_add_debt:'Add Debt', debt_summary_title:'Debt Summary', lbl_total_debt:'Total Debt',
+    lbl_riba_debt:'⚠️ Interest-Bearing (HARAM)', lbl_halal_debt:'✅ Interest-Free (Halal)', your_debts_title:'Your Debts'
   },
   ar: {
     nav_dashboard:'لوحة التحكم', nav_budget:'تتبع الميزانية', nav_zakat:'حاسبة الزكاة',
@@ -1562,7 +1586,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'سعر الذهب (£ للجرام)', lbl_silver_price:'سعر الفضة (£ للجرام)',
     btn_save_settings:'حفظ الإعدادات', msg_settings_saved:'✓ تم حفظ الإعدادات!',
     lbl_subscription:'الاشتراك', btn_manage_sub:'إدارة الاشتراك',
-    btn_upgrade:'ترقية — £4.99/شهر', settings_sub:'اضبط مذهبك واسمك وأسعار الذهب والفضة.'
+    btn_upgrade:'ترقية — £4.99/شهر', settings_sub:'اضبط مذهبك واسمك وأسعار الذهب والفضة.',
+    dash_total_assets:'إجمالي الأصول', dash_halal_wealth:'ثروة حلال', dash_month_income:'هذا الشهر: الدخل',
+    dash_halal_earnings:'مكاسب حلال', dash_month_expenses:'هذا الشهر: المصروفات', dash_total_spending:'إجمالي الإنفاق',
+    dash_zakat_status:'حالة الزكاة', btn_calculate:'احسب →', lbl_log_txn:'تسجيل معاملة',
+    lbl_description:'الوصف', lbl_amount_gbp:'المبلغ (£)', lbl_type:'النوع', lbl_category:'الفئة',
+    opt_income:'دخل ↑', opt_expense:'مصروف ↓', btn_add_txn:'إضافة معاملة', lbl_recent_txns:'المعاملات الأخيرة',
+    budget_sub:'تتبع الدخل والمصروفات الحلال. العناصر المحرمة تُوسَم تلقائياً.',
+    lbl_total_income:'إجمالي الدخل', lbl_total_expenses:'إجمالي المصروفات', lbl_net_balance:'صافي الرصيد',
+    btn_all:'الكل', btn_income_filter:'الدخل', btn_expenses_filter:'المصروفات', btn_flagged:'⚠️ المُوسَم', btn_clear_all:'مسح الكل',
+    zakat_assets_title:'أصولك الخاضعة للزكاة', lbl_cash_savings:'💷 النقد والمدخرات الحلال (£)',
+    lbl_halal_invest:'📈 الاستثمارات الحلال / الأسهم (£)', lbl_gold_grams:'🥇 ذهب (غرام)', lbl_silver_grams:'⬜ فضة (غرام)',
+    lbl_biz_inventory:'🏭 مخزون الأعمال / البضائع التجارية (£)', lbl_receivables:'💰 المستحقات / المبالغ المدينة (£)',
+    lbl_deduct_debts:'➖ الديون القابلة للخصم (£)', zakat_result_title:'نتيجة الزكاة',
+    lbl_gross_wealth:'الثروة الخاضعة للزكاة الإجمالية', lbl_less_debts:'ناقص: الديون القابلة للخصم',
+    lbl_net_wealth:'صافي الثروة الخاضعة للزكاة', lbl_nisab_threshold:'حد النصاب', lbl_zakat_rate:'نسبة الزكاة', lbl_zakat_due:'الزكاة المستحقة',
+    fitrana_title:'زكاة الفطر', lbl_household:'أفراد الأسرة', lbl_per_person:'للفرد (£)', lbl_total_fitrana:'إجمالي زكاة الفطر',
+    invest_sub:'تحقق من توافق الشركة أو الصندوق مع الشريعة الإسلامية.', screen_invest_title:'فحص استثمار',
+    lbl_company_name:'اسم الشركة / الصندوق / ETF', btn_screen_halal:'فحص الامتثال للحلال',
+    criteria_title:'معايير الفحص الشرعي', screen_history:'سجل الفحص', btn_clear:'مسح',
+    chat_page_title:'أمين — مستشارك المالي الإسلامي', chat_sub:'اسأل أي شيء عن التمويل الإسلامي.',
+    chat_disclaimer:'للفتاوى الشخصية، استشر عالماً إسلامياً مؤهلاً. هذا توجيه فقط.',
+    debt_sub:'تتبع ديونك. الديون بالفائدة تُوسَم — ابحث عن بدائل حلال.',
+    add_debt_title:'إضافة دين', lbl_amount_owed:'المبلغ المستحق (£)', lbl_creditor:'الدائن / المُقرض',
+    btn_add_debt:'إضافة دين', debt_summary_title:'ملخص الديون', lbl_total_debt:'إجمالي الديون',
+    lbl_riba_debt:'⚠️ بالفائدة (حرام)', lbl_halal_debt:'✅ بدون فائدة (حلال)', your_debts_title:'ديونك'
   },
   ur: {
     nav_dashboard:'ڈیش بورڈ', nav_budget:'بجٹ ٹریکر', nav_zakat:'زکوٰۃ کیلکولیٹر',
@@ -1576,7 +1624,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'سونے کی قیمت (£ فی گرام)', lbl_silver_price:'چاندی کی قیمت (£ فی گرام)',
     btn_save_settings:'ترتیبات محفوظ کریں', msg_settings_saved:'✓ ترتیبات محفوظ ہو گئیں!',
     lbl_subscription:'سبسکرپشن', btn_manage_sub:'سبسکرپشن منظم کریں',
-    btn_upgrade:'اپ گریڈ — £4.99/ماہ', settings_sub:'اپنا مذہب، نام اور سونے چاندی کی قیمت درج کریں۔'
+    btn_upgrade:'اپ گریڈ — £4.99/ماہ', settings_sub:'اپنا مذہب، نام اور سونے چاندی کی قیمت درج کریں۔',
+    dash_total_assets:'کل اثاثے', dash_halal_wealth:'حلال دولت', dash_month_income:'اس ماہ: آمدنی',
+    dash_halal_earnings:'حلال کمائی', dash_month_expenses:'اس ماہ: اخراجات', dash_total_spending:'کل خرچ',
+    dash_zakat_status:'زکوٰۃ کی صورتحال', btn_calculate:'حساب کریں →', lbl_log_txn:'لین دین درج کریں',
+    lbl_description:'تفصیل', lbl_amount_gbp:'رقم (£)', lbl_type:'قسم', lbl_category:'زمرہ',
+    opt_income:'آمدنی ↑', opt_expense:'خرچ ↓', btn_add_txn:'لین دین شامل کریں', lbl_recent_txns:'حالیہ لین دین',
+    budget_sub:'حلال آمدن و اخراجات کا ریکارڈ رکھیں۔ حرام اشیاء خودبخود نشاندہی ہوتی ہیں۔',
+    lbl_total_income:'کل آمدنی', lbl_total_expenses:'کل اخراجات', lbl_net_balance:'خالص بیلنس',
+    btn_all:'سب', btn_income_filter:'آمدنی', btn_expenses_filter:'اخراجات', btn_flagged:'⚠️ نشاندہی شدہ', btn_clear_all:'سب صاف کریں',
+    zakat_assets_title:'آپ کے قابل زکوٰۃ اثاثے', lbl_cash_savings:'💷 نقد اور حلال بینک بچت (£)',
+    lbl_halal_invest:'📈 حلال سرمایہ کاری / حصص (£)', lbl_gold_grams:'🥇 سونا (گرام)', lbl_silver_grams:'⬜ چاندی (گرام)',
+    lbl_biz_inventory:'🏭 کاروباری سامان / تجارتی مال (£)', lbl_receivables:'💰 واجبات / آپ کے قابل وصول (£)',
+    lbl_deduct_debts:'➖ قابل کٹوتی قرضے (£)', zakat_result_title:'زکوٰۃ کا نتیجہ',
+    lbl_gross_wealth:'مجموعی قابل زکوٰۃ دولت', lbl_less_debts:'منہا: قابل کٹوتی قرضے',
+    lbl_net_wealth:'خالص قابل زکوٰۃ دولت', lbl_nisab_threshold:'نصاب کی حد', lbl_zakat_rate:'زکوٰۃ کی شرح', lbl_zakat_due:'واجب الادا زکوٰۃ',
+    fitrana_title:'صدقۃ الفطر (فطرانہ)', lbl_household:'گھر کے افراد', lbl_per_person:'فی شخص (£)', lbl_total_fitrana:'کل صدقۃ الفطر',
+    invest_sub:'دیکھیں کہ کمپنی یا فنڈ شریعت کے موافق ہے یا نہیں۔', screen_invest_title:'سرمایہ کاری کی جانچ',
+    lbl_company_name:'کمپنی / فنڈ / ETF کا نام', btn_screen_halal:'حلال تعمیل کی جانچ کریں',
+    criteria_title:'شرعی جانچ کے معیارات', screen_history:'جانچ کی تاریخ', btn_clear:'صاف کریں',
+    chat_page_title:'امین — آپ کا حلال مالیاتی مشیر', chat_sub:'حلال مالیات کے بارے میں کچھ بھی پوچھیں۔',
+    chat_disclaimer:'ذاتی فتاویٰ کے لیے کسی مستند عالم دین سے رجوع کریں۔ یہ صرف رہنمائی ہے۔',
+    debt_sub:'اپنے قرضوں کا ریکارڈ رکھیں۔ سودی قرضے نشاندہی ہوتے ہیں — حلال متبادل تلاش کریں۔',
+    add_debt_title:'قرض شامل کریں', lbl_amount_owed:'واجب الادا رقم (£)', lbl_creditor:'قرض دہندہ',
+    btn_add_debt:'قرض شامل کریں', debt_summary_title:'قرض کا خلاصہ', lbl_total_debt:'کل قرض',
+    lbl_riba_debt:'⚠️ سودی (حرام)', lbl_halal_debt:'✅ بلا سود (حلال)', your_debts_title:'آپ کے قرضے'
   },
   bn: {
     nav_dashboard:'ড্যাশবোর্ড', nav_budget:'বাজেট ট্র্যাকার', nav_zakat:'যাকাত ক্যালকুলেটর',
@@ -1590,7 +1662,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'সোনার দাম (£ প্রতি গ্রাম)', lbl_silver_price:'রূপার দাম (£ প্রতি গ্রাম)',
     btn_save_settings:'সব সেটিংস সেভ করুন', msg_settings_saved:'✓ সেটিংস সেভ হয়েছে!',
     lbl_subscription:'সাবস্ক্রিপশন', btn_manage_sub:'সাবস্ক্রিপশন পরিচালনা',
-    btn_upgrade:'আপগ্রেড — £4.99/মাস', settings_sub:'আপনার মাযহাব, নাম ও সোনা-রূপার দাম নির্ধারণ করুন।'
+    btn_upgrade:'আপগ্রেড — £4.99/মাস', settings_sub:'আপনার মাযহাব, নাম ও সোনা-রূপার দাম নির্ধারণ করুন।',
+    dash_total_assets:'মোট সম্পদ', dash_halal_wealth:'হালাল সম্পদ', dash_month_income:'এই মাস: আয়',
+    dash_halal_earnings:'হালাল উপার্জন', dash_month_expenses:'এই মাস: ব্যয়', dash_total_spending:'মোট ব্যয়',
+    dash_zakat_status:'যাকাতের অবস্থা', btn_calculate:'হিসাব করুন →', lbl_log_txn:'লেনদেন যোগ করুন',
+    lbl_description:'বিবরণ', lbl_amount_gbp:'পরিমাণ (£)', lbl_type:'ধরন', lbl_category:'বিভাগ',
+    opt_income:'আয় ↑', opt_expense:'ব্যয় ↓', btn_add_txn:'লেনদেন যোগ করুন', lbl_recent_txns:'সাম্প্রতিক লেনদেন',
+    budget_sub:'হালাল আয় ও ব্যয় ট্র্যাক করুন। হারাম আইটেম স্বয়ংক্রিয়ভাবে চিহ্নিত হয়।',
+    lbl_total_income:'মোট আয়', lbl_total_expenses:'মোট ব্যয়', lbl_net_balance:'নিট ব্যালেন্স',
+    btn_all:'সব', btn_income_filter:'আয়', btn_expenses_filter:'ব্যয়', btn_flagged:'⚠️ চিহ্নিত', btn_clear_all:'সব মুছুন',
+    zakat_assets_title:'আপনার যাকাতযোগ্য সম্পদ', lbl_cash_savings:'💷 নগদ ও হালাল সঞ্চয় (£)',
+    lbl_halal_invest:'📈 হালাল বিনিয়োগ / শেয়ার (£)', lbl_gold_grams:'🥇 সোনা (গ্রাম)', lbl_silver_grams:'⬜ রূপা (গ্রাম)',
+    lbl_biz_inventory:'🏭 ব্যবসায়িক পণ্য / বাণিজ্য (£)', lbl_receivables:'💰 প্রাপ্যতা / পাওনা (£)',
+    lbl_deduct_debts:'➖ কর্তনযোগ্য ঋণ (£)', zakat_result_title:'যাকাতের ফলাফল',
+    lbl_gross_wealth:'মোট যাকাতযোগ্য সম্পদ', lbl_less_debts:'বাদ: কর্তনযোগ্য ঋণ',
+    lbl_net_wealth:'নিট যাকাতযোগ্য সম্পদ', lbl_nisab_threshold:'নিসাব সীমা', lbl_zakat_rate:'যাকাতের হার', lbl_zakat_due:'প্রদেয় যাকাত',
+    fitrana_title:'ফিতরা (যাকাতুল ফিতর)', lbl_household:'পরিবারের সদস্য', lbl_per_person:'প্রতি ব্যক্তি (£)', lbl_total_fitrana:'মোট ফিতরা',
+    invest_sub:'কোনো কোম্পানি বা ফান্ড শরিয়াহ সম্মত কিনা দেখুন।', screen_invest_title:'বিনিয়োগ যাচাই',
+    lbl_company_name:'কোম্পানি / ফান্ড / ETF নাম', btn_screen_halal:'হালাল সম্মতি যাচাই করুন',
+    criteria_title:'শরিয়াহ যাচাইয়ের মানদণ্ড', screen_history:'যাচাইয়ের ইতিহাস', btn_clear:'মুছুন',
+    chat_page_title:'আমিন — আপনার হালাল আর্থিক উপদেষ্টা', chat_sub:'হালাল অর্থায়ন সম্পর্কে যেকোনো প্রশ্ন করুন।',
+    chat_disclaimer:'ব্যক্তিগত ফতোয়ার জন্য একজন যোগ্য ইসলামী পণ্ডিতের পরামর্শ নিন। এটি শুধু নির্দেশনা।',
+    debt_sub:'আপনার ঋণ ট্র্যাক করুন। সুদযুক্ত ঋণ চিহ্নিত — হালাল বিকল্প খুঁজুন।',
+    add_debt_title:'ঋণ যোগ করুন', lbl_amount_owed:'বকেয়া পরিমাণ (£)', lbl_creditor:'পাওনাদার / ঋণদাতা',
+    btn_add_debt:'ঋণ যোগ করুন', debt_summary_title:'ঋণের সারাংশ', lbl_total_debt:'মোট ঋণ',
+    lbl_riba_debt:'⚠️ সুদযুক্ত (হারাম)', lbl_halal_debt:'✅ সুদমুক্ত (হালাল)', your_debts_title:'আপনার ঋণ'
   },
   tr: {
     nav_dashboard:'Gösterge Paneli', nav_budget:'Bütçe Takibi', nav_zakat:'Zekat Hesaplayıcı',
@@ -1604,7 +1700,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Altın Fiyatı (£/gram)', lbl_silver_price:'Gümüş Fiyatı (£/gram)',
     btn_save_settings:'Tüm Ayarları Kaydet', msg_settings_saved:'✓ Ayarlar kaydedildi!',
     lbl_subscription:'Abonelik', btn_manage_sub:'Aboneliği Yönet',
-    btn_upgrade:'Yükselt — £4.99/ay', settings_sub:'Mezhebinizi, adınızı ve altın/gümüş fiyatlarını yapılandırın.'
+    btn_upgrade:'Yükselt — £4.99/ay', settings_sub:'Mezhebinizi, adınızı ve altın/gümüş fiyatlarını yapılandırın.',
+    dash_total_assets:'Toplam Varlıklar', dash_halal_wealth:'Helal servet', dash_month_income:'Bu Ay: Gelir',
+    dash_halal_earnings:'Helal kazanç', dash_month_expenses:'Bu Ay: Giderler', dash_total_spending:'Toplam harcama',
+    dash_zakat_status:'Zekat Durumu', btn_calculate:'Hesapla →', lbl_log_txn:'İşlem Kaydet',
+    lbl_description:'Açıklama', lbl_amount_gbp:'Tutar (£)', lbl_type:'Tür', lbl_category:'Kategori',
+    opt_income:'Gelir ↑', opt_expense:'Gider ↓', btn_add_txn:'İşlem Ekle', lbl_recent_txns:'Son İşlemler',
+    budget_sub:'Helal gelir ve giderleri takip edin. Haram kalemler otomatik işaretlenir.',
+    lbl_total_income:'TOPLAM GELİR', lbl_total_expenses:'TOPLAM GİDER', lbl_net_balance:'NET BAKİYE',
+    btn_all:'Tümü', btn_income_filter:'Gelir', btn_expenses_filter:'Giderler', btn_flagged:'⚠️ İşaretli', btn_clear_all:'Tümünü Temizle',
+    zakat_assets_title:'Zekata Tabi Varlıklarınız', lbl_cash_savings:'💷 Nakit ve Helal Banka Tasarrufları (£)',
+    lbl_halal_invest:'📈 Helal Yatırım / Hisseler (£)', lbl_gold_grams:'🥇 Altın (gram)', lbl_silver_grams:'⬜ Gümüş (gram)',
+    lbl_biz_inventory:'🏭 İş Envanteri / Ticaret Malları (£)', lbl_receivables:'💰 Alacaklar / Size Borçlu Olunan (£)',
+    lbl_deduct_debts:'➖ Düşülebilir Borçlar (£)', zakat_result_title:'Zekat Sonucu',
+    lbl_gross_wealth:'Brüt Zekata Tabi Servet', lbl_less_debts:'Eksi: Düşülebilir Borçlar',
+    lbl_net_wealth:'Net Zekata Tabi Servet', lbl_nisab_threshold:'Nisap Eşiği', lbl_zakat_rate:'Zekat Oranı', lbl_zakat_due:'Ödenecek Zekat',
+    fitrana_title:'Fitre (Zekat\'ül Fıtr)', lbl_household:'Hane halkı', lbl_per_person:'Kişi başı (£)', lbl_total_fitrana:'Toplam Fitre',
+    invest_sub:'Bir şirket veya fonun Şeriat\'a uygun olup olmadığını kontrol edin.', screen_invest_title:'Yatırım Tara',
+    lbl_company_name:'Şirket / Fon / ETF Adı', btn_screen_halal:'Helal Uygunluk Tara',
+    criteria_title:'Şeriat Tarama Kriterleri', screen_history:'Tarama Geçmişi', btn_clear:'Temizle',
+    chat_page_title:'Emin — Helal Finansal Danışmanınız', chat_sub:'Helal finans hakkında her şeyi sorun.',
+    chat_disclaimer:'Kişisel fetvalar için nitelikli bir İslam âlimine danışın. Bu sadece rehberliktir.',
+    debt_sub:'Borçlarınızı takip edin. Faizli borçlar işaretlenir — helal alternatifler arayın.',
+    add_debt_title:'Borç Ekle', lbl_amount_owed:'Borçlu Tutar (£)', lbl_creditor:'Alacaklı / Borç Veren',
+    btn_add_debt:'Borç Ekle', debt_summary_title:'Borç Özeti', lbl_total_debt:'Toplam Borç',
+    lbl_riba_debt:'⚠️ Faizli (HARAM)', lbl_halal_debt:'✅ Faizsiz (Helal)', your_debts_title:'Borçlarınız'
   },
   fr: {
     nav_dashboard:'Tableau de bord', nav_budget:'Suivi du budget', nav_zakat:'Calculateur de Zakat',
@@ -1618,7 +1738,31 @@ const TRANSLATIONS = {
     lbl_gold_price:"Prix de l'or (£/gramme)", lbl_silver_price:"Prix de l'argent (£/gramme)",
     btn_save_settings:'Enregistrer les paramètres', msg_settings_saved:'✓ Paramètres sauvegardés!',
     lbl_subscription:'Abonnement', btn_manage_sub:"Gérer l'abonnement",
-    btn_upgrade:'Passer à Pro — £4.99/mois', settings_sub:'Configurez votre madhab, nom et prix des métaux précieux.'
+    btn_upgrade:'Passer à Pro — £4.99/mois', settings_sub:'Configurez votre madhab, nom et prix des métaux précieux.',
+    dash_total_assets:'Total des actifs', dash_halal_wealth:'Richesse halal', dash_month_income:'Ce mois: Revenus',
+    dash_halal_earnings:'Gains halal', dash_month_expenses:'Ce mois: Dépenses', dash_total_spending:'Dépenses totales',
+    dash_zakat_status:'Statut Zakat', btn_calculate:'Calculer →', lbl_log_txn:'Enregistrer une transaction',
+    lbl_description:'Description', lbl_amount_gbp:'Montant (£)', lbl_type:'Type', lbl_category:'Catégorie',
+    opt_income:'Revenu ↑', opt_expense:'Dépense ↓', btn_add_txn:'Ajouter une transaction', lbl_recent_txns:'Transactions récentes',
+    budget_sub:'Suivez les revenus et dépenses halal. Les éléments haram sont automatiquement signalés.',
+    lbl_total_income:'REVENU TOTAL', lbl_total_expenses:'DÉPENSES TOTALES', lbl_net_balance:'SOLDE NET',
+    btn_all:'Tout', btn_income_filter:'Revenus', btn_expenses_filter:'Dépenses', btn_flagged:'⚠️ Signalé', btn_clear_all:'Tout effacer',
+    zakat_assets_title:'Vos actifs zakatable', lbl_cash_savings:'💷 Liquidités et épargne bancaire halal (£)',
+    lbl_halal_invest:'📈 Investissements / Actions halal (£)', lbl_gold_grams:'🥇 Or (grammes)', lbl_silver_grams:'⬜ Argent (grammes)',
+    lbl_biz_inventory:"🏭 Stock d'entreprise / Marchandises (£)", lbl_receivables:'💰 Créances / Argent dû (£)',
+    lbl_deduct_debts:'➖ Dettes déductibles (£)', zakat_result_title:'Résultat Zakat',
+    lbl_gross_wealth:'Richesse brute zakatable', lbl_less_debts:'Moins: Dettes déductibles',
+    lbl_net_wealth:'Richesse nette zakatable', lbl_nisab_threshold:'Seuil Nisab', lbl_zakat_rate:'Taux Zakat', lbl_zakat_due:'Zakat due',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Membres du foyer', lbl_per_person:'Par personne (£)', lbl_total_fitrana:'Total Zakat al-Fitr',
+    invest_sub:"Vérifiez si une entreprise ou un fonds est conforme à la charia.", screen_invest_title:'Analyser un investissement',
+    lbl_company_name:'Nom de la société / Fonds / ETF', btn_screen_halal:'Vérifier la conformité halal',
+    criteria_title:'Critères de filtrage charia', screen_history:'Historique des analyses', btn_clear:'Effacer',
+    chat_page_title:'Amin — Votre conseiller financier halal', chat_sub:'Posez toutes vos questions sur la finance halal.',
+    chat_disclaimer:"Pour les fatwas personnelles, consultez toujours un érudit islamique qualifié. Ceci est uniquement un guide.",
+    debt_sub:'Suivez vos dettes. Les dettes à intérêt sont signalées — cherchez des alternatives halal.',
+    add_debt_title:'Ajouter une dette', lbl_amount_owed:'Montant dû (£)', lbl_creditor:'Créancier / Prêteur',
+    btn_add_debt:'Ajouter une dette', debt_summary_title:'Résumé des dettes', lbl_total_debt:'Dette totale',
+    lbl_riba_debt:"⚠️ À intérêt (HARAM)", lbl_halal_debt:'✅ Sans intérêt (Halal)', your_debts_title:'Vos dettes'
   },
   es: {
     nav_dashboard:'Panel de control', nav_budget:'Rastreador de presupuesto', nav_zakat:'Calculadora de Zakat',
@@ -1632,7 +1776,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Precio del oro (£/gramo)', lbl_silver_price:'Precio de la plata (£/gramo)',
     btn_save_settings:'Guardar configuración', msg_settings_saved:'✓ ¡Configuración guardada!',
     lbl_subscription:'Suscripción', btn_manage_sub:'Gestionar suscripción',
-    btn_upgrade:'Actualizar — £4.99/mes', settings_sub:'Configura tu madhab, nombre y precios de metales preciosos.'
+    btn_upgrade:'Actualizar — £4.99/mes', settings_sub:'Configura tu madhab, nombre y precios de metales preciosos.',
+    dash_total_assets:'Total de activos', dash_halal_wealth:'Riqueza halal', dash_month_income:'Este mes: Ingresos',
+    dash_halal_earnings:'Ganancias halal', dash_month_expenses:'Este mes: Gastos', dash_total_spending:'Gasto total',
+    dash_zakat_status:'Estado del Zakat', btn_calculate:'Calcular →', lbl_log_txn:'Registrar transacción',
+    lbl_description:'Descripción', lbl_amount_gbp:'Cantidad (£)', lbl_type:'Tipo', lbl_category:'Categoría',
+    opt_income:'Ingreso ↑', opt_expense:'Gasto ↓', btn_add_txn:'Agregar transacción', lbl_recent_txns:'Transacciones recientes',
+    budget_sub:'Rastrea ingresos y gastos halal. Los elementos haram se marcan automáticamente.',
+    lbl_total_income:'INGRESO TOTAL', lbl_total_expenses:'GASTOS TOTALES', lbl_net_balance:'SALDO NETO',
+    btn_all:'Todo', btn_income_filter:'Ingresos', btn_expenses_filter:'Gastos', btn_flagged:'⚠️ Marcado', btn_clear_all:'Borrar todo',
+    zakat_assets_title:'Sus activos sujetos a Zakat', lbl_cash_savings:'💷 Efectivo y ahorros bancarios halal (£)',
+    lbl_halal_invest:'📈 Inversiones / Acciones halal (£)', lbl_gold_grams:'🥇 Oro (gramos)', lbl_silver_grams:'⬜ Plata (gramos)',
+    lbl_biz_inventory:'🏭 Inventario / Mercancías (£)', lbl_receivables:'💰 Cuentas por cobrar (£)',
+    lbl_deduct_debts:'➖ Deudas deducibles (£)', zakat_result_title:'Resultado del Zakat',
+    lbl_gross_wealth:'Riqueza bruta sujeta a Zakat', lbl_less_debts:'Menos: Deudas deducibles',
+    lbl_net_wealth:'Riqueza neta sujeta a Zakat', lbl_nisab_threshold:'Umbral del Nisab', lbl_zakat_rate:'Tasa del Zakat', lbl_zakat_due:'Zakat a pagar',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Miembros del hogar', lbl_per_person:'Por persona (£)', lbl_total_fitrana:'Total Zakat al-Fitr',
+    invest_sub:'Comprueba si una empresa o fondo cumple con la sharia.', screen_invest_title:'Analizar una inversión',
+    lbl_company_name:'Nombre de la empresa / Fondo / ETF', btn_screen_halal:'Verificar cumplimiento halal',
+    criteria_title:'Criterios de filtrado sharia', screen_history:'Historial de análisis', btn_clear:'Borrar',
+    chat_page_title:'Amín — Tu asesor financiero halal', chat_sub:'Pregunta lo que quieras sobre finanzas halal.',
+    chat_disclaimer:'Para fatwas personales, consulte siempre a un erudito islámico calificado. Esta es solo orientación.',
+    debt_sub:'Rastrea tus deudas. Las deudas con intereses se marcan — busca alternativas halal.',
+    add_debt_title:'Agregar una deuda', lbl_amount_owed:'Monto adeudado (£)', lbl_creditor:'Acreedor / Prestamista',
+    btn_add_debt:'Agregar deuda', debt_summary_title:'Resumen de deudas', lbl_total_debt:'Deuda total',
+    lbl_riba_debt:'⚠️ Con interés (HARAM)', lbl_halal_debt:'✅ Sin interés (Halal)', your_debts_title:'Sus deudas'
   },
   pt: {
     nav_dashboard:'Painel', nav_budget:'Rastreador de orçamento', nav_zakat:'Calculadora de Zakat',
@@ -1646,7 +1814,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Preço do ouro (£/grama)', lbl_silver_price:'Preço da prata (£/grama)',
     btn_save_settings:'Salvar configurações', msg_settings_saved:'✓ Configurações salvas!',
     lbl_subscription:'Assinatura', btn_manage_sub:'Gerenciar assinatura',
-    btn_upgrade:'Atualizar — £4.99/mês', settings_sub:'Configure seu madhab, nome e preços dos metais preciosos.'
+    btn_upgrade:'Atualizar — £4.99/mês', settings_sub:'Configure seu madhab, nome e preços dos metais preciosos.',
+    dash_total_assets:'Total de ativos', dash_halal_wealth:'Riqueza halal', dash_month_income:'Este mês: Receitas',
+    dash_halal_earnings:'Ganhos halal', dash_month_expenses:'Este mês: Despesas', dash_total_spending:'Gasto total',
+    dash_zakat_status:'Status do Zakat', btn_calculate:'Calcular →', lbl_log_txn:'Registrar transação',
+    lbl_description:'Descrição', lbl_amount_gbp:'Valor (£)', lbl_type:'Tipo', lbl_category:'Categoria',
+    opt_income:'Receita ↑', opt_expense:'Despesa ↓', btn_add_txn:'Adicionar transação', lbl_recent_txns:'Transações recentes',
+    budget_sub:'Acompanhe receitas e despesas halal. Itens haram são sinalizados automaticamente.',
+    lbl_total_income:'RECEITA TOTAL', lbl_total_expenses:'DESPESAS TOTAIS', lbl_net_balance:'SALDO LÍQUIDO',
+    btn_all:'Todos', btn_income_filter:'Receitas', btn_expenses_filter:'Despesas', btn_flagged:'⚠️ Sinalizado', btn_clear_all:'Limpar tudo',
+    zakat_assets_title:'Seus ativos sujeitos ao Zakat', lbl_cash_savings:'💷 Dinheiro e poupança bancária halal (£)',
+    lbl_halal_invest:'📈 Investimentos / Ações halal (£)', lbl_gold_grams:'🥇 Ouro (gramas)', lbl_silver_grams:'⬜ Prata (gramas)',
+    lbl_biz_inventory:'🏭 Estoque / Mercadorias (£)', lbl_receivables:'💰 Contas a receber (£)',
+    lbl_deduct_debts:'➖ Dívidas dedutíveis (£)', zakat_result_title:'Resultado do Zakat',
+    lbl_gross_wealth:'Riqueza bruta sujeita ao Zakat', lbl_less_debts:'Menos: Dívidas dedutíveis',
+    lbl_net_wealth:'Riqueza líquida sujeita ao Zakat', lbl_nisab_threshold:'Limiar do Nisab', lbl_zakat_rate:'Taxa do Zakat', lbl_zakat_due:'Zakat a pagar',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Membros da família', lbl_per_person:'Por pessoa (£)', lbl_total_fitrana:'Total Zakat al-Fitr',
+    invest_sub:'Verifique se uma empresa ou fundo está em conformidade com a sharia.', screen_invest_title:'Analisar um investimento',
+    lbl_company_name:'Nome da empresa / Fundo / ETF', btn_screen_halal:'Verificar conformidade halal',
+    criteria_title:'Critérios de triagem sharia', screen_history:'Histórico de análises', btn_clear:'Limpar',
+    chat_page_title:'Amim — Seu consultor financeiro halal', chat_sub:'Pergunte qualquer coisa sobre finanças halal.',
+    chat_disclaimer:'Para fatwas pessoais, consulte sempre um estudioso islâmico qualificado. Este é apenas um guia.',
+    debt_sub:'Acompanhe suas dívidas. Dívidas com juros são sinalizadas — busque alternativas halal.',
+    add_debt_title:'Adicionar uma dívida', lbl_amount_owed:'Valor devido (£)', lbl_creditor:'Credor / Emprestador',
+    btn_add_debt:'Adicionar dívida', debt_summary_title:'Resumo de dívidas', lbl_total_debt:'Dívida total',
+    lbl_riba_debt:'⚠️ Com juros (HARAM)', lbl_halal_debt:'✅ Sem juros (Halal)', your_debts_title:'Suas dívidas'
   },
   de: {
     nav_dashboard:'Übersicht', nav_budget:'Budgetverfolgung', nav_zakat:'Zakat-Rechner',
@@ -1660,7 +1852,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Goldpreis (£/Gramm)', lbl_silver_price:'Silberpreis (£/Gramm)',
     btn_save_settings:'Alle Einstellungen speichern', msg_settings_saved:'✓ Einstellungen gespeichert!',
     lbl_subscription:'Abonnement', btn_manage_sub:'Abonnement verwalten',
-    btn_upgrade:'Upgraden — £4.99/Monat', settings_sub:'Konfigurieren Sie Ihren Madhab, Namen und Edelmetallpreise.'
+    btn_upgrade:'Upgraden — £4.99/Monat', settings_sub:'Konfigurieren Sie Ihren Madhab, Namen und Edelmetallpreise.',
+    dash_total_assets:'Gesamtvermögen', dash_halal_wealth:'Halal-Vermögen', dash_month_income:'Diesen Monat: Einnahmen',
+    dash_halal_earnings:'Halal-Verdienst', dash_month_expenses:'Diesen Monat: Ausgaben', dash_total_spending:'Gesamtausgaben',
+    dash_zakat_status:'Zakat-Status', btn_calculate:'Berechnen →', lbl_log_txn:'Transaktion erfassen',
+    lbl_description:'Beschreibung', lbl_amount_gbp:'Betrag (£)', lbl_type:'Typ', lbl_category:'Kategorie',
+    opt_income:'Einnahme ↑', opt_expense:'Ausgabe ↓', btn_add_txn:'Transaktion hinzufügen', lbl_recent_txns:'Letzte Transaktionen',
+    budget_sub:'Verfolgen Sie halal Ein- und Ausgaben. Haram-Elemente werden automatisch markiert.',
+    lbl_total_income:'GESAMTEINNAHMEN', lbl_total_expenses:'GESAMTAUSGABEN', lbl_net_balance:'NETTOGUTHABEN',
+    btn_all:'Alle', btn_income_filter:'Einnahmen', btn_expenses_filter:'Ausgaben', btn_flagged:'⚠️ Markiert', btn_clear_all:'Alle löschen',
+    zakat_assets_title:'Ihre zakatzahlungspflichtigen Vermögenswerte', lbl_cash_savings:'💷 Bargeld und Halal-Bankguthaben (£)',
+    lbl_halal_invest:'📈 Halal-Investments / Aktien (£)', lbl_gold_grams:'🥇 Gold (Gramm)', lbl_silver_grams:'⬜ Silber (Gramm)',
+    lbl_biz_inventory:'🏭 Geschäftsbestand / Waren (£)', lbl_receivables:'💰 Forderungen / Ausstehende Beträge (£)',
+    lbl_deduct_debts:'➖ Absetzbare Schulden (£)', zakat_result_title:'Zakat-Ergebnis',
+    lbl_gross_wealth:'Brutto-Zakat-Vermögen', lbl_less_debts:'Abzüglich: Absetzbare Schulden',
+    lbl_net_wealth:'Netto-Zakat-Vermögen', lbl_nisab_threshold:'Nisab-Schwelle', lbl_zakat_rate:'Zakat-Satz', lbl_zakat_due:'Fällige Zakat',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Haushaltsmitglieder', lbl_per_person:'Pro Person (£)', lbl_total_fitrana:'Gesamt Zakat al-Fitr',
+    invest_sub:'Prüfen Sie, ob ein Unternehmen oder Fonds Scharia-konform ist.', screen_invest_title:'Investition prüfen',
+    lbl_company_name:'Unternehmen / Fonds / ETF Name', btn_screen_halal:'Auf Halal-Konformität prüfen',
+    criteria_title:'Scharia-Screening-Kriterien', screen_history:'Prüfungsverlauf', btn_clear:'Löschen',
+    chat_page_title:'Amin — Ihr Halal-Finanzberater', chat_sub:'Fragen Sie alles über Halal-Finanzen.',
+    chat_disclaimer:'Für persönliche Fatwas wenden Sie sich immer an einen qualifizierten islamischen Gelehrten. Dies ist nur eine Orientierung.',
+    debt_sub:'Verfolgen Sie Ihre Schulden. Zinsschulden werden markiert — suchen Sie Halal-Alternativen.',
+    add_debt_title:'Schulden hinzufügen', lbl_amount_owed:'Geschuldeter Betrag (£)', lbl_creditor:'Gläubiger / Kreditgeber',
+    btn_add_debt:'Schulden hinzufügen', debt_summary_title:'Schuldenübersicht', lbl_total_debt:'Gesamtschulden',
+    lbl_riba_debt:'⚠️ Verzinst (HARAM)', lbl_halal_debt:'✅ Zinsfrei (Halal)', your_debts_title:'Ihre Schulden'
   },
   id: {
     nav_dashboard:'Dasbor', nav_budget:'Pelacak Anggaran', nav_zakat:'Kalkulator Zakat',
@@ -1674,7 +1890,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Harga Emas (£/gram)', lbl_silver_price:'Harga Perak (£/gram)',
     btn_save_settings:'Simpan Semua Pengaturan', msg_settings_saved:'✓ Pengaturan tersimpan!',
     lbl_subscription:'Langganan', btn_manage_sub:'Kelola Langganan',
-    btn_upgrade:'Tingkatkan — £4.99/bulan', settings_sub:'Konfigurasi mazhab, nama, dan harga emas/perak Anda.'
+    btn_upgrade:'Tingkatkan — £4.99/bulan', settings_sub:'Konfigurasi mazhab, nama, dan harga emas/perak Anda.',
+    dash_total_assets:'Total Aset', dash_halal_wealth:'Kekayaan halal', dash_month_income:'Bulan Ini: Pendapatan',
+    dash_halal_earnings:'Penghasilan halal', dash_month_expenses:'Bulan Ini: Pengeluaran', dash_total_spending:'Total pengeluaran',
+    dash_zakat_status:'Status Zakat', btn_calculate:'Hitung →', lbl_log_txn:'Catat Transaksi',
+    lbl_description:'Deskripsi', lbl_amount_gbp:'Jumlah (£)', lbl_type:'Jenis', lbl_category:'Kategori',
+    opt_income:'Pendapatan ↑', opt_expense:'Pengeluaran ↓', btn_add_txn:'Tambah Transaksi', lbl_recent_txns:'Transaksi Terbaru',
+    budget_sub:'Lacak pendapatan dan pengeluaran halal. Item haram otomatis ditandai.',
+    lbl_total_income:'TOTAL PENDAPATAN', lbl_total_expenses:'TOTAL PENGELUARAN', lbl_net_balance:'SALDO BERSIH',
+    btn_all:'Semua', btn_income_filter:'Pendapatan', btn_expenses_filter:'Pengeluaran', btn_flagged:'⚠️ Ditandai', btn_clear_all:'Hapus Semua',
+    zakat_assets_title:'Aset Zakatable Anda', lbl_cash_savings:'💷 Tunai dan Tabungan Bank Halal (£)',
+    lbl_halal_invest:'📈 Investasi / Saham Halal (£)', lbl_gold_grams:'🥇 Emas (gram)', lbl_silver_grams:'⬜ Perak (gram)',
+    lbl_biz_inventory:'🏭 Inventaris Bisnis / Barang Dagangan (£)', lbl_receivables:'💰 Piutang / Uang yang Harus Diterima (£)',
+    lbl_deduct_debts:'➖ Hutang yang Dapat Dikurangi (£)', zakat_result_title:'Hasil Zakat',
+    lbl_gross_wealth:'Total Kekayaan Zakatable', lbl_less_debts:'Dikurangi: Hutang yang Dapat Dikurangi',
+    lbl_net_wealth:'Kekayaan Bersih Zakatable', lbl_nisab_threshold:'Batas Nisab', lbl_zakat_rate:'Tarif Zakat', lbl_zakat_due:'Zakat Terutang',
+    fitrana_title:'Zakat Fitrah', lbl_household:'Anggota rumah tangga', lbl_per_person:'Per orang (£)', lbl_total_fitrana:'Total Zakat Fitrah',
+    invest_sub:'Cek apakah perusahaan atau reksa dana sesuai syariah.', screen_invest_title:'Skrining Investasi',
+    lbl_company_name:'Nama Perusahaan / Dana / ETF', btn_screen_halal:'Skrining Kehalalan',
+    criteria_title:'Kriteria Skrining Syariah', screen_history:'Riwayat Skrining', btn_clear:'Hapus',
+    chat_page_title:'Amin — Penasihat Keuangan Halal Anda', chat_sub:'Tanyakan apa saja tentang keuangan halal.',
+    chat_disclaimer:'Untuk fatwa pribadi, selalu konsultasikan dengan ulama Islam yang berkualifikasi. Ini hanya panduan.',
+    debt_sub:'Lacak hutang Anda. Hutang berbunga ditandai — cari alternatif halal.',
+    add_debt_title:'Tambah Hutang', lbl_amount_owed:'Jumlah Terutang (£)', lbl_creditor:'Kreditur / Pemberi Pinjaman',
+    btn_add_debt:'Tambah Hutang', debt_summary_title:'Ringkasan Hutang', lbl_total_debt:'Total Hutang',
+    lbl_riba_debt:'⚠️ Berbunga (HARAM)', lbl_halal_debt:'✅ Bebas Bunga (Halal)', your_debts_title:'Hutang Anda'
   },
   ms: {
     nav_dashboard:'Papan Pemuka', nav_budget:'Penjejak Bajet', nav_zakat:'Kalkulator Zakat',
@@ -1688,7 +1928,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Harga Emas (£/gram)', lbl_silver_price:'Harga Perak (£/gram)',
     btn_save_settings:'Simpan Semua Tetapan', msg_settings_saved:'✓ Tetapan disimpan!',
     lbl_subscription:'Langganan', btn_manage_sub:'Urus Langganan',
-    btn_upgrade:'Naik Taraf — £4.99/bulan', settings_sub:'Konfigurasikan mazhab, nama dan harga emas/perak anda.'
+    btn_upgrade:'Naik Taraf — £4.99/bulan', settings_sub:'Konfigurasikan mazhab, nama dan harga emas/perak anda.',
+    dash_total_assets:'Jumlah Aset', dash_halal_wealth:'Kekayaan halal', dash_month_income:'Bulan Ini: Pendapatan',
+    dash_halal_earnings:'Pendapatan halal', dash_month_expenses:'Bulan Ini: Perbelanjaan', dash_total_spending:'Jumlah perbelanjaan',
+    dash_zakat_status:'Status Zakat', btn_calculate:'Kira →', lbl_log_txn:'Log Transaksi',
+    lbl_description:'Penerangan', lbl_amount_gbp:'Jumlah (£)', lbl_type:'Jenis', lbl_category:'Kategori',
+    opt_income:'Pendapatan ↑', opt_expense:'Perbelanjaan ↓', btn_add_txn:'Tambah Transaksi', lbl_recent_txns:'Transaksi Terkini',
+    budget_sub:'Jejaki pendapatan dan perbelanjaan halal. Item haram ditandakan secara automatik.',
+    lbl_total_income:'JUMLAH PENDAPATAN', lbl_total_expenses:'JUMLAH PERBELANJAAN', lbl_net_balance:'BAKI BERSIH',
+    btn_all:'Semua', btn_income_filter:'Pendapatan', btn_expenses_filter:'Perbelanjaan', btn_flagged:'⚠️ Ditandakan', btn_clear_all:'Padam Semua',
+    zakat_assets_title:'Aset Zakat Anda', lbl_cash_savings:'💷 Tunai dan Simpanan Bank Halal (£)',
+    lbl_halal_invest:'📈 Pelaburan / Saham Halal (£)', lbl_gold_grams:'🥇 Emas (gram)', lbl_silver_grams:'⬜ Perak (gram)',
+    lbl_biz_inventory:'🏭 Inventori Perniagaan / Barangan (£)', lbl_receivables:'💰 Penghutang / Wang Terhutang (£)',
+    lbl_deduct_debts:'➖ Hutang Boleh Ditolak (£)', zakat_result_title:'Keputusan Zakat',
+    lbl_gross_wealth:'Kekayaan Zakat Kasar', lbl_less_debts:'Tolak: Hutang Boleh Ditolak',
+    lbl_net_wealth:'Kekayaan Zakat Bersih', lbl_nisab_threshold:'Had Nisab', lbl_zakat_rate:'Kadar Zakat', lbl_zakat_due:'Zakat Perlu Dibayar',
+    fitrana_title:'Zakat Fitrah', lbl_household:'Ahli isi rumah', lbl_per_person:'Setiap orang (£)', lbl_total_fitrana:'Jumlah Zakat Fitrah',
+    invest_sub:'Semak sama ada syarikat atau dana mematuhi Syariah.', screen_invest_title:'Saringan Pelaburan',
+    lbl_company_name:'Nama Syarikat / Dana / ETF', btn_screen_halal:'Saringan Pematuhan Halal',
+    criteria_title:'Kriteria Saringan Syariah', screen_history:'Sejarah Saringan', btn_clear:'Padam',
+    chat_page_title:'Amin — Penasihat Kewangan Halal Anda', chat_sub:'Tanya apa sahaja tentang kewangan halal.',
+    chat_disclaimer:'Untuk fatwa peribadi, sentiasa rujuk ulama Islam yang berkelayakan. Ini hanya panduan.',
+    debt_sub:'Jejaki hutang anda. Hutang berfaedah ditandakan — cari alternatif halal.',
+    add_debt_title:'Tambah Hutang', lbl_amount_owed:'Jumlah Terhutang (£)', lbl_creditor:'Pemiutang / Pemberi Pinjaman',
+    btn_add_debt:'Tambah Hutang', debt_summary_title:'Ringkasan Hutang', lbl_total_debt:'Jumlah Hutang',
+    lbl_riba_debt:'⚠️ Berfaedah (HARAM)', lbl_halal_debt:'✅ Bebas Faedah (Halal)', your_debts_title:'Hutang Anda'
   },
   fa: {
     nav_dashboard:'داشبورد', nav_budget:'ردیاب بودجه', nav_zakat:'ماشین‌حساب زکات',
@@ -1702,7 +1966,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'قیمت طلا (£ در هر گرم)', lbl_silver_price:'قیمت نقره (£ در هر گرم)',
     btn_save_settings:'ذخیره تنظیمات', msg_settings_saved:'✓ تنظیمات ذخیره شد!',
     lbl_subscription:'اشتراک', btn_manage_sub:'مدیریت اشتراک',
-    btn_upgrade:'ارتقا — £4.99/ماه', settings_sub:'مذهب، نام و قیمت طلا/نقره خود را تنظیم کنید.'
+    btn_upgrade:'ارتقا — £4.99/ماه', settings_sub:'مذهب، نام و قیمت طلا/نقره خود را تنظیم کنید.',
+    dash_total_assets:'کل دارایی‌ها', dash_halal_wealth:'ثروت حلال', dash_month_income:'این ماه: درآمد',
+    dash_halal_earnings:'درآمد حلال', dash_month_expenses:'این ماه: هزینه‌ها', dash_total_spending:'کل هزینه',
+    dash_zakat_status:'وضعیت زکات', btn_calculate:'محاسبه →', lbl_log_txn:'ثبت تراکنش',
+    lbl_description:'توضیحات', lbl_amount_gbp:'مبلغ (£)', lbl_type:'نوع', lbl_category:'دسته‌بندی',
+    opt_income:'درآمد ↑', opt_expense:'هزینه ↓', btn_add_txn:'افزودن تراکنش', lbl_recent_txns:'تراکنش‌های اخیر',
+    budget_sub:'درآمد و هزینه‌های حلال را دنبال کنید. موارد حرام به‌طور خودکار علامت‌گذاری می‌شوند.',
+    lbl_total_income:'کل درآمد', lbl_total_expenses:'کل هزینه‌ها', lbl_net_balance:'موجودی خالص',
+    btn_all:'همه', btn_income_filter:'درآمد', btn_expenses_filter:'هزینه‌ها', btn_flagged:'⚠️ علامت‌گذاری شده', btn_clear_all:'پاک کردن همه',
+    zakat_assets_title:'دارایی‌های مشمول زکات شما', lbl_cash_savings:'💷 نقد و پس‌انداز بانکی حلال (£)',
+    lbl_halal_invest:'📈 سرمایه‌گذاری حلال / سهام (£)', lbl_gold_grams:'🥇 طلا (گرم)', lbl_silver_grams:'⬜ نقره (گرم)',
+    lbl_biz_inventory:'🏭 موجودی کسب‌وکار / کالاهای تجاری (£)', lbl_receivables:'💰 مطالبات / مبالغ بدهکار به شما (£)',
+    lbl_deduct_debts:'➖ بدهی‌های قابل کسر (£)', zakat_result_title:'نتیجه زکات',
+    lbl_gross_wealth:'ثروت ناخالص مشمول زکات', lbl_less_debts:'کسر: بدهی‌های قابل کسر',
+    lbl_net_wealth:'ثروت خالص مشمول زکات', lbl_nisab_threshold:'حد نصاب', lbl_zakat_rate:'نرخ زکات', lbl_zakat_due:'زکات واجب',
+    fitrana_title:'زکات فطر', lbl_household:'اعضای خانواده', lbl_per_person:'به ازای هر نفر (£)', lbl_total_fitrana:'کل زکات فطر',
+    invest_sub:'بررسی کنید آیا یک شرکت یا صندوق با شریعت مطابقت دارد.', screen_invest_title:'بررسی سرمایه‌گذاری',
+    lbl_company_name:'نام شرکت / صندوق / ETF', btn_screen_halal:'بررسی انطباق حلال',
+    criteria_title:'معیارهای غربالگری شریعت', screen_history:'تاریخچه بررسی', btn_clear:'پاک کردن',
+    chat_page_title:'امین — مشاور مالی حلال شما', chat_sub:'هر سوالی درباره مالی حلال بپرسید.',
+    chat_disclaimer:'برای فتوای شخصی، همیشه با یک عالم دینی واجد شرایط مشورت کنید. این فقط راهنمایی است.',
+    debt_sub:'بدهی‌های خود را دنبال کنید. بدهی‌های بهره‌دار علامت‌گذاری می‌شوند — به دنبال جایگزین‌های حلال باشید.',
+    add_debt_title:'افزودن بدهی', lbl_amount_owed:'مبلغ بدهی (£)', lbl_creditor:'طلبکار / وام‌دهنده',
+    btn_add_debt:'افزودن بدهی', debt_summary_title:'خلاصه بدهی‌ها', lbl_total_debt:'کل بدهی',
+    lbl_riba_debt:'⚠️ بهره‌دار (حرام)', lbl_halal_debt:'✅ بدون بهره (حلال)', your_debts_title:'بدهی‌های شما'
   },
   ha: {
     nav_dashboard:'Allon Kula', nav_budget:'Mai Bin Kasafin Kuɗi', nav_zakat:'Lissafin Zakka',
@@ -1716,7 +2004,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Farashin Zinariya (£/gram)', lbl_silver_price:'Farashin Azurfa (£/gram)',
     btn_save_settings:'Adana Duk Saiti', msg_settings_saved:'✓ An adana saiti!',
     lbl_subscription:'Biyan Kuɗi', btn_manage_sub:'Sarrafa Biyan Kuɗi',
-    btn_upgrade:'Haɓaka — £4.99/wata', settings_sub:'Tsara mazhabinka, sunanka da farashin ƙarfe masu daraja.'
+    btn_upgrade:'Haɓaka — £4.99/wata', settings_sub:'Tsara mazhabinka, sunanka da farashin ƙarfe masu daraja.',
+    dash_total_assets:'Dukkan Kadarori', dash_halal_wealth:'Dukiya halal', dash_month_income:'Wannan Wata: Kudin Shiga',
+    dash_halal_earnings:'Kudin shiga na halal', dash_month_expenses:'Wannan Wata: Kashe-kashe', dash_total_spending:'Jimlar kashe-kashe',
+    dash_zakat_status:'Yanayin Zakka', btn_calculate:'Lissafta →', lbl_log_txn:"Rubuta Ma'amala",
+    lbl_description:'Bayani', lbl_amount_gbp:'Adadi (£)', lbl_type:'Iri', lbl_category:'Rukunin',
+    opt_income:'Kudin Shiga ↑', opt_expense:'Kashe-kashe ↓', btn_add_txn:"Ƙara Ma'amala", lbl_recent_txns:"Ma'amalolin Kwanan nan",
+    budget_sub:'Bi diddigin kudin shiga da kashe-kashe na halal. Ana nuna abubuwan haramun kai tsaye.',
+    lbl_total_income:'JIMLAR KUDIN SHIGA', lbl_total_expenses:'JIMLAR KASHE-KASHE', lbl_net_balance:'RAGOWAR KUƊI',
+    btn_all:'Duka', btn_income_filter:'Kudin Shiga', btn_expenses_filter:'Kashe-kashe', btn_flagged:'⚠️ An Nuna', btn_clear_all:'Share Duka',
+    zakat_assets_title:'Kadarorinka na Zakka', lbl_cash_savings:'💷 Kuɗi da Ajiyar Banki na Halal (£)',
+    lbl_halal_invest:'📈 Zuba Jari na Halal / Hannun Jari (£)', lbl_gold_grams:'🥇 Zinariya (gram)', lbl_silver_grams:'⬜ Azurfa (gram)',
+    lbl_biz_inventory:'🏭 Kayan Kasuwanci / Dukiyar Cinikin (£)', lbl_receivables:'💰 Kuɗin da ake bin ka (£)',
+    lbl_deduct_debts:'➖ Bashi mai ragi (£)', zakat_result_title:'Sakamakon Zakka',
+    lbl_gross_wealth:'Jimlar Dukiyar Zakka', lbl_less_debts:'Rage: Bashi mai ragi',
+    lbl_net_wealth:'Net Dukiyar Zakka', lbl_nisab_threshold:'Iyakar Nisabi', lbl_zakat_rate:'Kimar Zakka', lbl_zakat_due:'Zakka da ake biya',
+    fitrana_title:'Zakkat al-Fitr (Fitrana)', lbl_household:'Mazaunan gida', lbl_per_person:'Kowane mutum (£)', lbl_total_fitrana:'Jimlar Zakkat al-Fitr',
+    invest_sub:"Duba ko kamfani ko asusun ya dace da shari'a.", screen_invest_title:'Gwada Zuba Jari',
+    lbl_company_name:'Sunan Kamfani / Asusun / ETF', btn_screen_halal:'Gwada Halal',
+    criteria_title:"Ma'aunin Gwajin Shari'a", screen_history:'Tarihin Gwaji', btn_clear:'Share',
+    chat_page_title:'Amin — Mai Shawara kan Kuɗin Halal', chat_sub:'Yi tambaya game da kudin halal.',
+    chat_disclaimer:'Don fatawa na sirri, tuntuɓi malamin Musulunci mai cancanta. Wannan jagoranci kawai ne.',
+    debt_sub:'Bi diddigin basussuka. Bashi mai riba ana nuna shi — nemi madadin halal.',
+    add_debt_title:'Ƙara Bashi', lbl_amount_owed:'Adadin Bashi (£)', lbl_creditor:'Mai Bashi / Mai Ba da Lamuni',
+    btn_add_debt:'Ƙara Bashi', debt_summary_title:'Taƙaitaccen Bashi', lbl_total_debt:'Jimlar Bashi',
+    lbl_riba_debt:'⚠️ Da Riba (HARAMUN)', lbl_halal_debt:'✅ Babu Riba (Halal)', your_debts_title:'Basussukan ka'
   },
   sw: {
     nav_dashboard:'Dashibodi', nav_budget:'Kifuatilio cha Bajeti', nav_zakat:'Kikokotoo cha Zakat',
@@ -1730,7 +2042,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Bei ya Dhahabu (£/gramu)', lbl_silver_price:'Bei ya Fedha (£/gramu)',
     btn_save_settings:'Hifadhi Mipangilio Yote', msg_settings_saved:'✓ Mipangilio imehifadhiwa!',
     lbl_subscription:'Usajili', btn_manage_sub:'Simamia Usajili',
-    btn_upgrade:'Boresha — £4.99/mwezi', settings_sub:'Sanidi madhehebu yako, jina na bei za dhahabu/fedha.'
+    btn_upgrade:'Boresha — £4.99/mwezi', settings_sub:'Sanidi madhehebu yako, jina na bei za dhahabu/fedha.',
+    dash_total_assets:'Jumla ya Mali', dash_halal_wealth:'Utajiri halali', dash_month_income:'Mwezi Huu: Mapato',
+    dash_halal_earnings:'Mapato ya halali', dash_month_expenses:'Mwezi Huu: Matumizi', dash_total_spending:'Matumizi yote',
+    dash_zakat_status:'Hali ya Zaka', btn_calculate:'Hesabu →', lbl_log_txn:'Rekodi Muamala',
+    lbl_description:'Maelezo', lbl_amount_gbp:'Kiasi (£)', lbl_type:'Aina', lbl_category:'Kategoria',
+    opt_income:'Mapato ↑', opt_expense:'Matumizi ↓', btn_add_txn:'Ongeza Muamala', lbl_recent_txns:'Miamala ya Hivi Karibuni',
+    budget_sub:'Fuatilia mapato na matumizi ya halali. Vitu vya haramu vinawekewa alama moja kwa moja.',
+    lbl_total_income:'JUMLA YA MAPATO', lbl_total_expenses:'JUMLA YA MATUMIZI', lbl_net_balance:'SALIO HALISI',
+    btn_all:'Yote', btn_income_filter:'Mapato', btn_expenses_filter:'Matumizi', btn_flagged:'⚠️ Iliyoashiriwa', btn_clear_all:'Futa Yote',
+    zakat_assets_title:'Mali Zako za Zaka', lbl_cash_savings:'💷 Pesa Taslimu na Akiba ya Benki Halali (£)',
+    lbl_halal_invest:'📈 Uwekezaji / Hisa Halali (£)', lbl_gold_grams:'🥇 Dhahabu (gramu)', lbl_silver_grams:'⬜ Fedha (gramu)',
+    lbl_biz_inventory:'🏭 Bidhaa za Biashara / Mizigo (£)', lbl_receivables:'💰 Madai / Pesa Inayodaiwa (£)',
+    lbl_deduct_debts:'➖ Madeni Yanayokatwa (£)', zakat_result_title:'Matokeo ya Zaka',
+    lbl_gross_wealth:'Utajiri Mkubwa wa Zaka', lbl_less_debts:'Punguza: Madeni Yanayokatwa',
+    lbl_net_wealth:'Utajiri Halisi wa Zaka', lbl_nisab_threshold:'Kiwango cha Nisabu', lbl_zakat_rate:'Kiwango cha Zaka', lbl_zakat_due:'Zaka Inayodaiwa',
+    fitrana_title:'Zakat al-Fitr (Fitrana)', lbl_household:'Wanafamilia', lbl_per_person:'Kwa kila mtu (£)', lbl_total_fitrana:'Jumla ya Zakat al-Fitr',
+    invest_sub:'Angalia kama kampuni au mfuko unafuata sheria ya Kiislamu.', screen_invest_title:'Chunguza Uwekezaji',
+    lbl_company_name:'Jina la Kampuni / Mfuko / ETF', btn_screen_halal:'Chunguza Utiifu wa Halali',
+    criteria_title:'Vigezo vya Uchunguzi wa Sharia', screen_history:'Historia ya Uchunguzi', btn_clear:'Futa',
+    chat_page_title:'Amin — Mshauri Wako wa Fedha Halali', chat_sub:'Uliza chochote kuhusu fedha za halali.',
+    chat_disclaimer:'Kwa fatawa za kibinafsi, daima wasiliana na mwanachuoni wa Kiislamu aliyehitimu. Hii ni mwongozo tu.',
+    debt_sub:'Fuatilia madeni yako. Madeni ya riba yanawekewa alama — tafuta mbadala za halali.',
+    add_debt_title:'Ongeza Deni', lbl_amount_owed:'Kiasi Kinachostahili (£)', lbl_creditor:'Mdai / Mkopeshaji',
+    btn_add_debt:'Ongeza Deni', debt_summary_title:'Muhtasari wa Madeni', lbl_total_debt:'Jumla ya Madeni',
+    lbl_riba_debt:'⚠️ Yenye Riba (HARAMU)', lbl_halal_debt:'✅ Bila Riba (Halali)', your_debts_title:'Madeni Yako'
   },
   so: {
     nav_dashboard:'Wajiga Xogta', nav_budget:'Raadraaca Miisaaniyada', nav_zakat:'Xisaabiyaha Zakada',
@@ -1744,7 +2080,31 @@ const TRANSLATIONS = {
     lbl_gold_price:'Qiimaha Dahabka (£/giraam)', lbl_silver_price:'Qiimaha Lacagta Caddaanka (£/giraam)',
     btn_save_settings:'Keydi Dhammaan Xulashooyinka', msg_settings_saved:'✓ Xulashooyinku waa la keydsaday!',
     lbl_subscription:'Rukhsadda', btn_manage_sub:'Maamul Rukhsadda',
-    btn_upgrade:'Kor u qaad — £4.99/bil', settings_sub:'Habee madhhabkaaga, magacaaga iyo qiimaha biraha qaaliga ah.'
+    btn_upgrade:'Kor u qaad — £4.99/bil', settings_sub:'Habee madhhabkaaga, magacaaga iyo qiimaha biraha qaaliga ah.',
+    dash_total_assets:'Wadarta Hantida', dash_halal_wealth:'Hanti Xalaal ah', dash_month_income:'Bishaan: Dakhliga',
+    dash_halal_earnings:'Dakhli xalaal ah', dash_month_expenses:'Bishaan: Kharashka', dash_total_spending:'Wadarta kharashka',
+    dash_zakat_status:'Xaaladda Zakada', btn_calculate:'Xisaabi →', lbl_log_txn:'Diiwaangelinta Macaamalada',
+    lbl_description:'Sharaxaad', lbl_amount_gbp:'Xaddiga (£)', lbl_type:'Nooca', lbl_category:'Qaybta',
+    opt_income:'Dakhli ↑', opt_expense:'Kharash ↓', btn_add_txn:'Kudar Macaamalad', lbl_recent_txns:'Macaamaladaha Dhowaan',
+    budget_sub:'Raac dakhliga iyo kharashka xalaasha. Walxaha xaaraamka ah si toos ah ayaa lagu calaamadeeyaa.',
+    lbl_total_income:'WADARTA DAKHLIGA', lbl_total_expenses:'WADARTA KHARASHKA', lbl_net_balance:'SAAFIGA DHEEFSHIIDKA',
+    btn_all:'Dhammaan', btn_income_filter:'Dakhli', btn_expenses_filter:'Kharash', btn_flagged:'⚠️ La Calaamadeeyey', btn_clear_all:'Nadiifi Dhammaan',
+    zakat_assets_title:'Hantidaada Zakada', lbl_cash_savings:'💷 Lacagta iyo Keydka Bangiga Xalaasha (£)',
+    lbl_halal_invest:'📈 Maalgashiga Xalaasha / Sahamyada (£)', lbl_gold_grams:'🥇 Dahabka (giraam)', lbl_silver_grams:'⬜ Lacagta Caddaanka (giraam)',
+    lbl_biz_inventory:'🏭 Alaabta Ganacsiga / Badeecadaha (£)', lbl_receivables:'💰 Lacagta La Sugayo (£)',
+    lbl_deduct_debts:'➖ Deymaha La Goyn karo (£)', zakat_result_title:'Natiijada Zakada',
+    lbl_gross_wealth:'Wadarta Hantida Zakada', lbl_less_debts:'Ka dhimo: Deymaha La Goyn karo',
+    lbl_net_wealth:'Saafiga Hantida Zakada', lbl_nisab_threshold:'Xadka Nisaabka', lbl_zakat_rate:'Heerka Zakada', lbl_zakat_due:'Zakada La Bixiyo',
+    fitrana_title:'Zakada Fitriga', lbl_household:'Xubnaha Guriga', lbl_per_person:'Qof kasta (£)', lbl_total_fitrana:'Wadarta Zakada Fitriga',
+    invest_sub:'Hubi haddii shirkad ama fund u hoggaansanto Sharciga Islaamka.', screen_invest_title:'Baarista Maalgashiga',
+    lbl_company_name:'Magaca Shirkadda / Fund / ETF', btn_screen_halal:'Baari Waafaqnaanta Xalaasha',
+    criteria_title:'Shuruudaha Sharica', screen_history:'Taariikhda Baarista', btn_clear:'Nadiifi',
+    chat_page_title:'Amin — Khabiirkaaga Maaliyadeed ee Xalaasha', chat_sub:'Wax kasta ku weydii dhaqaalaha xalaasha.',
+    chat_disclaimer:'Fatwawo shakhsi ahaan, mar walba la tasho culimo Islaam oo xirfad leh. Tani waa hagaajin keliya.',
+    debt_sub:'Raac deymahaga. Deymaha ribada ah waa la calaamadeeyaa — raadi beddelka xalaasha.',
+    add_debt_title:'Kudar Deyn', lbl_amount_owed:'Xaddiga La Bixiyo (£)', lbl_creditor:'Amaahiyaha / Daynta',
+    btn_add_debt:'Kudar Deyn', debt_summary_title:'Kooban Deymaha', lbl_total_debt:'Wadarta Deymaha',
+    lbl_riba_debt:'⚠️ Ribada (XAARAAM)', lbl_halal_debt:'✅ Riba La\'aan (Xalaal)', your_debts_title:'Deymahaga'
   }
 };
 
@@ -1776,6 +2136,7 @@ function setLanguage(lang) {
 function selectLanguage(lang) {
   setLanguage(lang);
   saveData();
+  renderAll();
 }
 
 // ─────────────────────────────────────────────
