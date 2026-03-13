@@ -209,7 +209,7 @@
     </div>
   </nav>
   <div style="padding:12px 16px; border-top:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:8px;">
-    <div id="trial-banner" class="trial-banner" onclick="showTrialModal()"></div>
+    <div id="trial-banner" class="trial-banner" onclick="handleBannerClick()"></div>
     <div id="sidebar-user-email" style="color:rgba(255,255,255,0.5);font-size:.68rem;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
     <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:6px;padding:6px;font-size:.75rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">Sign Out</button>
     <p style="color:rgba(255,255,255,0.25); font-size:0.65rem; text-align:center; margin:0;">Guidance only. Consult a scholar for fatwas.</p>
@@ -888,8 +888,8 @@ function updateTrialBanner() {
 
   if (isPro) {
     banner.className = 'trial-banner trial-ok';
-    banner.textContent = '✓ Pro';
-    banner.style.cursor = 'default';
+    banner.textContent = '✓ Pro — manage';
+    banner.style.cursor = 'pointer';
   } else if (days > 7) {
     banner.className = 'trial-banner trial-ok';
     banner.textContent = `Free trial: ${days} days left`;
@@ -921,6 +921,14 @@ function updateTrialBanner() {
       if (manageBtn) manageBtn.style.display = 'none';
       if (upgradeBtn) upgradeBtn.style.display = 'block';
     }
+  }
+}
+
+function handleBannerClick() {
+  if (currentUser?.subscriptionStatus === 'active') {
+    openPortal();
+  } else {
+    showTrialModal();
   }
 }
 
