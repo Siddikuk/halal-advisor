@@ -234,7 +234,7 @@
   <section id="sec-dashboard">
     <div class="page-header">
       <h2 style="font-size:1.6rem;font-weight:700;">Assalamu Alaikum, <span id="welcomeName">Brother/Sister</span> ☽</h2>
-      <p style="opacity:.85;margin-top:4px;font-size:.92rem;">Madhab: <span id="header-madhab-name" style="font-weight:700;color:var(--gold-light);">Shafi'i</span> · GBP · All calculations follow your madhab's rulings</p>
+      <p style="opacity:.85;margin-top:4px;font-size:.92rem;"><span data-i18n="dash_madhab_prefix">Madhab:</span> <span id="header-madhab-name" style="font-weight:700;color:var(--gold-light);">Shafi'i</span><span data-i18n="dash_rulings_suffix"> · GBP · All calculations follow your madhab's rulings</span></p>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
       <div class="stat-card">
@@ -1086,13 +1086,14 @@ function updateMadhabUI() {
     if (el) el.textContent = cfg.name;
   });
 
-  // Update chat welcome message
+  // Update chat welcome message in the current language
   const welcome = document.getElementById('chat-welcome-msg');
   if (welcome) {
+    const t = TRANSLATIONS[data.settings.language] || TRANSLATIONS.en;
     welcome.innerHTML = `<strong>Assalamu Alaikum wa Rahmatullahi wa Barakatuh! 🌙</strong><br><br>
-      I'm Amin, your halal financial advisor following the <strong>${cfg.name} madhab (${cfg.arabic})</strong>.<br><br>
-      I can help with halal investments, Islamic mortgages, zakat, riba-free banking, takaful, and more — all in <strong>£ GBP</strong> and according to <strong>${cfg.name}</strong> rulings.<br><br>
-      What can I help you with today, InshaaAllah?`;
+      ${t.chat_amin_intro} <strong>${cfg.name} madhab (${cfg.arabic})</strong>.<br><br>
+      ${t.chat_amin_services} <strong>${cfg.name}</strong> rulings.<br><br>
+      ${t.chat_amin_question}`;
   }
 
   // Zakat section
@@ -1572,7 +1573,11 @@ const TRANSLATIONS = {
     debt_sub:'Track your debts. Interest-bearing debts are flagged — seek halal alternatives.',
     add_debt_title:'Add a Debt', lbl_amount_owed:'Amount Owed (£)', lbl_creditor:'Creditor / Lender',
     btn_add_debt:'Add Debt', debt_summary_title:'Debt Summary', lbl_total_debt:'Total Debt',
-    lbl_riba_debt:'⚠️ Interest-Bearing (HARAM)', lbl_halal_debt:'✅ Interest-Free (Halal)', your_debts_title:'Your Debts'
+    lbl_riba_debt:'⚠️ Interest-Bearing (HARAM)', lbl_halal_debt:'✅ Interest-Free (Halal)', your_debts_title:'Your Debts',
+    dash_madhab_prefix:'Madhab:', dash_rulings_suffix:'· GBP · All calculations follow your madhab\'s rulings',
+    chat_amin_intro:"I'm Amin, your halal financial advisor following the",
+    chat_amin_services:'I can help with halal investments, Islamic mortgages, zakat, riba-free banking, takaful, and more — all in £ GBP and according to',
+    chat_amin_question:'What can I help you with today, InshaaAllah?'
   },
   ar: {
     nav_dashboard:'لوحة التحكم', nav_budget:'تتبع الميزانية', nav_zakat:'حاسبة الزكاة',
@@ -1610,7 +1615,11 @@ const TRANSLATIONS = {
     debt_sub:'تتبع ديونك. الديون بالفائدة تُوسَم — ابحث عن بدائل حلال.',
     add_debt_title:'إضافة دين', lbl_amount_owed:'المبلغ المستحق (£)', lbl_creditor:'الدائن / المُقرض',
     btn_add_debt:'إضافة دين', debt_summary_title:'ملخص الديون', lbl_total_debt:'إجمالي الديون',
-    lbl_riba_debt:'⚠️ بالفائدة (حرام)', lbl_halal_debt:'✅ بدون فائدة (حلال)', your_debts_title:'ديونك'
+    lbl_riba_debt:'⚠️ بالفائدة (حرام)', lbl_halal_debt:'✅ بدون فائدة (حلال)', your_debts_title:'ديونك',
+    dash_madhab_prefix:'المذهب:', dash_rulings_suffix:'· جنيه · جميع الحسابات وفق مذهبك',
+    chat_amin_intro:'أنا أمين، مستشارك المالي الإسلامي المتبع لمذهب',
+    chat_amin_services:'يمكنني مساعدتك في الاستثمارات الحلال، الرهن الإسلامي، الزكاة، المصارف بلا ربا، التكافل والمزيد — بالجنيه الإسترليني ووفق مذهب',
+    chat_amin_question:'بماذا يمكنني مساعدتك اليوم، إن شاء الله؟'
   },
   ur: {
     nav_dashboard:'ڈیش بورڈ', nav_budget:'بجٹ ٹریکر', nav_zakat:'زکوٰۃ کیلکولیٹر',
@@ -1648,7 +1657,11 @@ const TRANSLATIONS = {
     debt_sub:'اپنے قرضوں کا ریکارڈ رکھیں۔ سودی قرضے نشاندہی ہوتے ہیں — حلال متبادل تلاش کریں۔',
     add_debt_title:'قرض شامل کریں', lbl_amount_owed:'واجب الادا رقم (£)', lbl_creditor:'قرض دہندہ',
     btn_add_debt:'قرض شامل کریں', debt_summary_title:'قرض کا خلاصہ', lbl_total_debt:'کل قرض',
-    lbl_riba_debt:'⚠️ سودی (حرام)', lbl_halal_debt:'✅ بلا سود (حلال)', your_debts_title:'آپ کے قرضے'
+    lbl_riba_debt:'⚠️ سودی (حرام)', lbl_halal_debt:'✅ بلا سود (حلال)', your_debts_title:'آپ کے قرضے',
+    dash_madhab_prefix:'مذہب:', dash_rulings_suffix:'· پاؤنڈ · تمام حسابات آپ کے مذہب کے مطابق',
+    chat_amin_intro:'میں امین ہوں، آپ کا حلال مالیاتی مشیر جو مذہب',
+    chat_amin_services:'میں حلال سرمایہ کاری، اسلامی مارگیج، زکوٰۃ، ربا سے پاک بینکنگ اور تکافل میں مدد کر سکتا ہوں — پاؤنڈ میں اور',
+    chat_amin_question:'آج میں آپ کی کیا مدد کر سکتا ہوں، ان شاء اللہ؟'
   },
   bn: {
     nav_dashboard:'ড্যাশবোর্ড', nav_budget:'বাজেট ট্র্যাকার', nav_zakat:'যাকাত ক্যালকুলেটর',
@@ -1686,7 +1699,11 @@ const TRANSLATIONS = {
     debt_sub:'আপনার ঋণ ট্র্যাক করুন। সুদযুক্ত ঋণ চিহ্নিত — হালাল বিকল্প খুঁজুন।',
     add_debt_title:'ঋণ যোগ করুন', lbl_amount_owed:'বকেয়া পরিমাণ (£)', lbl_creditor:'পাওনাদার / ঋণদাতা',
     btn_add_debt:'ঋণ যোগ করুন', debt_summary_title:'ঋণের সারাংশ', lbl_total_debt:'মোট ঋণ',
-    lbl_riba_debt:'⚠️ সুদযুক্ত (হারাম)', lbl_halal_debt:'✅ সুদমুক্ত (হালাল)', your_debts_title:'আপনার ঋণ'
+    lbl_riba_debt:'⚠️ সুদযুক্ত (হারাম)', lbl_halal_debt:'✅ সুদমুক্ত (হালাল)', your_debts_title:'আপনার ঋণ',
+    dash_madhab_prefix:'মাযহাব:', dash_rulings_suffix:'· £ · সকল হিসাব আপনার মাযহাব অনুসারে',
+    chat_amin_intro:'আমি আমিন, আপনার হালাল আর্থিক উপদেষ্টা, যিনি অনুসরণ করেন',
+    chat_amin_services:'আমি হালাল বিনিয়োগ, ইসলামী মর্টগেজ, যাকাত, সুদমুক্ত ব্যাংকিং এবং তাকাফুলে সাহায্য করতে পারি — £ পাউন্ডে এবং',
+    chat_amin_question:'ইনশাআল্লাহ, আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?'
   },
   tr: {
     nav_dashboard:'Gösterge Paneli', nav_budget:'Bütçe Takibi', nav_zakat:'Zekat Hesaplayıcı',
@@ -1724,7 +1741,11 @@ const TRANSLATIONS = {
     debt_sub:'Borçlarınızı takip edin. Faizli borçlar işaretlenir — helal alternatifler arayın.',
     add_debt_title:'Borç Ekle', lbl_amount_owed:'Borçlu Tutar (£)', lbl_creditor:'Alacaklı / Borç Veren',
     btn_add_debt:'Borç Ekle', debt_summary_title:'Borç Özeti', lbl_total_debt:'Toplam Borç',
-    lbl_riba_debt:'⚠️ Faizli (HARAM)', lbl_halal_debt:'✅ Faizsiz (Helal)', your_debts_title:'Borçlarınız'
+    lbl_riba_debt:'⚠️ Faizli (HARAM)', lbl_halal_debt:'✅ Faizsiz (Helal)', your_debts_title:'Borçlarınız',
+    dash_madhab_prefix:'Mezhep:', dash_rulings_suffix:'· GBP · Tüm hesaplamalar mezhebin kurallarına göre',
+    chat_amin_intro:'Ben Emin, mezhebini takip eden helal finansal danışmanınızım:',
+    chat_amin_services:'Helal yatırımlar, İslami konut finansmanı, zekat, faizsiz bankacılık, tekafül ve daha fazlasında yardımcı olabilirim — £ GBP cinsinden ve',
+    chat_amin_question:'İnşallah bugün size nasıl yardımcı olabilirim?'
   },
   fr: {
     nav_dashboard:'Tableau de bord', nav_budget:'Suivi du budget', nav_zakat:'Calculateur de Zakat',
@@ -1762,7 +1783,11 @@ const TRANSLATIONS = {
     debt_sub:'Suivez vos dettes. Les dettes à intérêt sont signalées — cherchez des alternatives halal.',
     add_debt_title:'Ajouter une dette', lbl_amount_owed:'Montant dû (£)', lbl_creditor:'Créancier / Prêteur',
     btn_add_debt:'Ajouter une dette', debt_summary_title:'Résumé des dettes', lbl_total_debt:'Dette totale',
-    lbl_riba_debt:"⚠️ À intérêt (HARAM)", lbl_halal_debt:'✅ Sans intérêt (Halal)', your_debts_title:'Vos dettes'
+    lbl_riba_debt:"⚠️ À intérêt (HARAM)", lbl_halal_debt:'✅ Sans intérêt (Halal)', your_debts_title:'Vos dettes',
+    dash_madhab_prefix:'Madhab :', dash_rulings_suffix:'· GBP · Tous les calculs suivent les règles de votre madhab',
+    chat_amin_intro:'Je suis Amin, votre conseiller financier halal suivant le madhab',
+    chat_amin_services:'Je peux aider avec les investissements halal, les hypothèques islamiques, la zakat, la banque sans riba, le takaful et plus — en £ GBP et selon le madhab',
+    chat_amin_question:"Comment puis-je vous aider aujourd'hui, InshaaAllah ?"
   },
   es: {
     nav_dashboard:'Panel de control', nav_budget:'Rastreador de presupuesto', nav_zakat:'Calculadora de Zakat',
@@ -1800,7 +1825,11 @@ const TRANSLATIONS = {
     debt_sub:'Rastrea tus deudas. Las deudas con intereses se marcan — busca alternativas halal.',
     add_debt_title:'Agregar una deuda', lbl_amount_owed:'Monto adeudado (£)', lbl_creditor:'Acreedor / Prestamista',
     btn_add_debt:'Agregar deuda', debt_summary_title:'Resumen de deudas', lbl_total_debt:'Deuda total',
-    lbl_riba_debt:'⚠️ Con interés (HARAM)', lbl_halal_debt:'✅ Sin interés (Halal)', your_debts_title:'Sus deudas'
+    lbl_riba_debt:'⚠️ Con interés (HARAM)', lbl_halal_debt:'✅ Sin interés (Halal)', your_debts_title:'Sus deudas',
+    dash_madhab_prefix:'Madhab:', dash_rulings_suffix:'· GBP · Todos los cálculos siguen las normas de tu madhab',
+    chat_amin_intro:'Soy Amín, tu asesor financiero halal que sigue el madhab',
+    chat_amin_services:'Puedo ayudar con inversiones halal, hipotecas islámicas, zakat, banca libre de riba, takaful y más — en £ GBP y según el madhab',
+    chat_amin_question:'¿En qué puedo ayudarte hoy, InshaaAllah?'
   },
   pt: {
     nav_dashboard:'Painel', nav_budget:'Rastreador de orçamento', nav_zakat:'Calculadora de Zakat',
@@ -1838,7 +1867,11 @@ const TRANSLATIONS = {
     debt_sub:'Acompanhe suas dívidas. Dívidas com juros são sinalizadas — busque alternativas halal.',
     add_debt_title:'Adicionar uma dívida', lbl_amount_owed:'Valor devido (£)', lbl_creditor:'Credor / Emprestador',
     btn_add_debt:'Adicionar dívida', debt_summary_title:'Resumo de dívidas', lbl_total_debt:'Dívida total',
-    lbl_riba_debt:'⚠️ Com juros (HARAM)', lbl_halal_debt:'✅ Sem juros (Halal)', your_debts_title:'Suas dívidas'
+    lbl_riba_debt:'⚠️ Com juros (HARAM)', lbl_halal_debt:'✅ Sem juros (Halal)', your_debts_title:'Suas dívidas',
+    dash_madhab_prefix:'Madhab:', dash_rulings_suffix:'· GBP · Todos os cálculos seguem as regras do seu madhab',
+    chat_amin_intro:'Sou Amim, seu consultor financeiro halal seguindo o madhab',
+    chat_amin_services:'Posso ajudar com investimentos halal, hipotecas islâmicas, zakat, bancos sem riba, takaful e mais — em £ GBP e segundo o madhab',
+    chat_amin_question:'Como posso ajudá-lo hoje, InshaaAllah?'
   },
   de: {
     nav_dashboard:'Übersicht', nav_budget:'Budgetverfolgung', nav_zakat:'Zakat-Rechner',
@@ -1876,7 +1909,11 @@ const TRANSLATIONS = {
     debt_sub:'Verfolgen Sie Ihre Schulden. Zinsschulden werden markiert — suchen Sie Halal-Alternativen.',
     add_debt_title:'Schulden hinzufügen', lbl_amount_owed:'Geschuldeter Betrag (£)', lbl_creditor:'Gläubiger / Kreditgeber',
     btn_add_debt:'Schulden hinzufügen', debt_summary_title:'Schuldenübersicht', lbl_total_debt:'Gesamtschulden',
-    lbl_riba_debt:'⚠️ Verzinst (HARAM)', lbl_halal_debt:'✅ Zinsfrei (Halal)', your_debts_title:'Ihre Schulden'
+    lbl_riba_debt:'⚠️ Verzinst (HARAM)', lbl_halal_debt:'✅ Zinsfrei (Halal)', your_debts_title:'Ihre Schulden',
+    dash_madhab_prefix:'Madhab:', dash_rulings_suffix:'· GBP · Alle Berechnungen folgen den Regeln Ihres Madhab',
+    chat_amin_intro:'Ich bin Amin, Ihr Halal-Finanzberater, der dem Madhab',
+    chat_amin_services:'Ich kann bei Halal-Investitionen, islamischen Hypotheken, Zakat, zinsfreiem Banking, Takaful und mehr helfen — in £ GBP und gemäß dem Madhab',
+    chat_amin_question:'Womit kann ich Ihnen heute helfen, InshaaAllah?'
   },
   id: {
     nav_dashboard:'Dasbor', nav_budget:'Pelacak Anggaran', nav_zakat:'Kalkulator Zakat',
@@ -1914,7 +1951,11 @@ const TRANSLATIONS = {
     debt_sub:'Lacak hutang Anda. Hutang berbunga ditandai — cari alternatif halal.',
     add_debt_title:'Tambah Hutang', lbl_amount_owed:'Jumlah Terutang (£)', lbl_creditor:'Kreditur / Pemberi Pinjaman',
     btn_add_debt:'Tambah Hutang', debt_summary_title:'Ringkasan Hutang', lbl_total_debt:'Total Hutang',
-    lbl_riba_debt:'⚠️ Berbunga (HARAM)', lbl_halal_debt:'✅ Bebas Bunga (Halal)', your_debts_title:'Hutang Anda'
+    lbl_riba_debt:'⚠️ Berbunga (HARAM)', lbl_halal_debt:'✅ Bebas Bunga (Halal)', your_debts_title:'Hutang Anda',
+    dash_madhab_prefix:'Mazhab:', dash_rulings_suffix:'· GBP · Semua perhitungan mengikuti aturan mazhab Anda',
+    chat_amin_intro:'Saya Amin, penasihat keuangan halal Anda yang mengikuti mazhab',
+    chat_amin_services:'Saya dapat membantu dengan investasi halal, KPR syariah, zakat, perbankan bebas riba, takaful dan lainnya — dalam £ GBP dan menurut mazhab',
+    chat_amin_question:'Apa yang bisa saya bantu hari ini, InsyaAllah?'
   },
   ms: {
     nav_dashboard:'Papan Pemuka', nav_budget:'Penjejak Bajet', nav_zakat:'Kalkulator Zakat',
@@ -1952,7 +1993,11 @@ const TRANSLATIONS = {
     debt_sub:'Jejaki hutang anda. Hutang berfaedah ditandakan — cari alternatif halal.',
     add_debt_title:'Tambah Hutang', lbl_amount_owed:'Jumlah Terhutang (£)', lbl_creditor:'Pemiutang / Pemberi Pinjaman',
     btn_add_debt:'Tambah Hutang', debt_summary_title:'Ringkasan Hutang', lbl_total_debt:'Jumlah Hutang',
-    lbl_riba_debt:'⚠️ Berfaedah (HARAM)', lbl_halal_debt:'✅ Bebas Faedah (Halal)', your_debts_title:'Hutang Anda'
+    lbl_riba_debt:'⚠️ Berfaedah (HARAM)', lbl_halal_debt:'✅ Bebas Faedah (Halal)', your_debts_title:'Hutang Anda',
+    dash_madhab_prefix:'Mazhab:', dash_rulings_suffix:'· GBP · Semua pengiraan mengikut peraturan mazhab anda',
+    chat_amin_intro:'Saya Amin, penasihat kewangan halal anda yang mengikuti mazhab',
+    chat_amin_services:'Saya boleh membantu dengan pelaburan halal, gadai janji Islam, zakat, perbankan bebas riba, takaful dan lain-lain — dalam £ GBP dan mengikut mazhab',
+    chat_amin_question:'Apa yang boleh saya bantu hari ini, InsyaAllah?'
   },
   fa: {
     nav_dashboard:'داشبورد', nav_budget:'ردیاب بودجه', nav_zakat:'ماشین‌حساب زکات',
@@ -1990,7 +2035,11 @@ const TRANSLATIONS = {
     debt_sub:'بدهی‌های خود را دنبال کنید. بدهی‌های بهره‌دار علامت‌گذاری می‌شوند — به دنبال جایگزین‌های حلال باشید.',
     add_debt_title:'افزودن بدهی', lbl_amount_owed:'مبلغ بدهی (£)', lbl_creditor:'طلبکار / وام‌دهنده',
     btn_add_debt:'افزودن بدهی', debt_summary_title:'خلاصه بدهی‌ها', lbl_total_debt:'کل بدهی',
-    lbl_riba_debt:'⚠️ بهره‌دار (حرام)', lbl_halal_debt:'✅ بدون بهره (حلال)', your_debts_title:'بدهی‌های شما'
+    lbl_riba_debt:'⚠️ بهره‌دار (حرام)', lbl_halal_debt:'✅ بدون بهره (حلال)', your_debts_title:'بدهی‌های شما',
+    dash_madhab_prefix:'مذهب:', dash_rulings_suffix:'· پوند · تمام محاسبات طبق قوانین مذهب شما',
+    chat_amin_intro:'من امین هستم، مشاور مالی حلال شما که از مذهب',
+    chat_amin_services:'می‌توانم در سرمایه‌گذاری حلال، وام مسکن اسلامی، زکات، بانکداری بدون ربا، تکافل و بیشتر کمک کنم — به پوند و طبق مذهب',
+    chat_amin_question:'امروز چطور می‌توانم کمکتان کنم، ان شاء الله؟'
   },
   ha: {
     nav_dashboard:'Allon Kula', nav_budget:'Mai Bin Kasafin Kuɗi', nav_zakat:'Lissafin Zakka',
@@ -2028,7 +2077,11 @@ const TRANSLATIONS = {
     debt_sub:'Bi diddigin basussuka. Bashi mai riba ana nuna shi — nemi madadin halal.',
     add_debt_title:'Ƙara Bashi', lbl_amount_owed:'Adadin Bashi (£)', lbl_creditor:'Mai Bashi / Mai Ba da Lamuni',
     btn_add_debt:'Ƙara Bashi', debt_summary_title:'Taƙaitaccen Bashi', lbl_total_debt:'Jimlar Bashi',
-    lbl_riba_debt:'⚠️ Da Riba (HARAMUN)', lbl_halal_debt:'✅ Babu Riba (Halal)', your_debts_title:'Basussukan ka'
+    lbl_riba_debt:'⚠️ Da Riba (HARAMUN)', lbl_halal_debt:'✅ Babu Riba (Halal)', your_debts_title:'Basussukan ka',
+    dash_madhab_prefix:'Mazhabar:', dash_rulings_suffix:'· GBP · Duk lissafin bisa ka\'idojin mazhabinka',
+    chat_amin_intro:'Ni ne Amin, mai ba ka shawara kan kuɗi na halal wanda ke bin mazhabar',
+    chat_amin_services:'Zan iya taimaka da zuba jari na halal, lamunin gida na Musulunci, zakka, bankin da ba shi da riba, takaful da sauransu — da £ GBP kuma bisa mazhabar',
+    chat_amin_question:'Yaya zan iya taimaka maka yau, idan Allah Ya yarda?'
   },
   sw: {
     nav_dashboard:'Dashibodi', nav_budget:'Kifuatilio cha Bajeti', nav_zakat:'Kikokotoo cha Zakat',
@@ -2066,7 +2119,11 @@ const TRANSLATIONS = {
     debt_sub:'Fuatilia madeni yako. Madeni ya riba yanawekewa alama — tafuta mbadala za halali.',
     add_debt_title:'Ongeza Deni', lbl_amount_owed:'Kiasi Kinachostahili (£)', lbl_creditor:'Mdai / Mkopeshaji',
     btn_add_debt:'Ongeza Deni', debt_summary_title:'Muhtasari wa Madeni', lbl_total_debt:'Jumla ya Madeni',
-    lbl_riba_debt:'⚠️ Yenye Riba (HARAMU)', lbl_halal_debt:'✅ Bila Riba (Halali)', your_debts_title:'Madeni Yako'
+    lbl_riba_debt:'⚠️ Yenye Riba (HARAMU)', lbl_halal_debt:'✅ Bila Riba (Halali)', your_debts_title:'Madeni Yako',
+    dash_madhab_prefix:'Madhehebu:', dash_rulings_suffix:'· GBP · Hesabu zote zinafuata sheria za madhehebu yako',
+    chat_amin_intro:'Mimi ni Amin, mshauri wako wa fedha halali anayefuata madhehebu ya',
+    chat_amin_services:'Ninaweza kusaidia na uwekezaji halali, mikopo ya nyumba ya Kiislamu, zaka, benki bila riba, takaful na zaidi — kwa £ GBP na kulingana na madhehebu ya',
+    chat_amin_question:'Ninaweza kukusaidia nini leo, InshaAllah?'
   },
   so: {
     nav_dashboard:'Wajiga Xogta', nav_budget:'Raadraaca Miisaaniyada', nav_zakat:'Xisaabiyaha Zakada',
@@ -2104,7 +2161,11 @@ const TRANSLATIONS = {
     debt_sub:'Raac deymahaga. Deymaha ribada ah waa la calaamadeeyaa — raadi beddelka xalaasha.',
     add_debt_title:'Kudar Deyn', lbl_amount_owed:'Xaddiga La Bixiyo (£)', lbl_creditor:'Amaahiyaha / Daynta',
     btn_add_debt:'Kudar Deyn', debt_summary_title:'Kooban Deymaha', lbl_total_debt:'Wadarta Deymaha',
-    lbl_riba_debt:'⚠️ Ribada (XAARAAM)', lbl_halal_debt:'✅ Riba La\'aan (Xalaal)', your_debts_title:'Deymahaga'
+    lbl_riba_debt:'⚠️ Ribada (XAARAAM)', lbl_halal_debt:'✅ Riba La\'aan (Xalaal)', your_debts_title:'Deymahaga',
+    dash_madhab_prefix:'Madhhabka:', dash_rulings_suffix:'· GBP · Dhammaan xisaabaha waxay raacayaan xeerarka madhhabkaaga',
+    chat_amin_intro:'Waxaan ahay Amin, khabiirkaaga maaliyadeed ee xalaasha ee raacaya madhhabka',
+    chat_amin_services:'Waxaan kaa caawin karaa maalgashiga xalaasha, amaahda guryaha ee Islaamka, zakada, bangiyada aan ribada lahayn, takaful iyo wax badan — £ GBP ku jira iyo sida madhhabka',
+    chat_amin_question:'Maxaan kaa caawin karaa maanta, InshaaAllah?'
   }
 };
 
