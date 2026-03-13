@@ -9,6 +9,13 @@ node_modules/
 *.db-shm
 *.db-wal
 
+# Android build outputs — machine-specific, not needed in git
+android/local.properties
+android/.gradle/
+android/app/build/
+android/build/
+android/capacitor-cordova-android-plugins/build/
+
 # Logs
 npm-debug.log*
 *.log
