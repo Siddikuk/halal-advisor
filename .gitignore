@@ -9,6 +9,11 @@ node_modules/
 *.db-shm
 *.db-wal
 
+# Android keystores — contain private signing credentials, NEVER commit
+halal-advisor-keystore
+*.keystore
+*.jks
+
 # Android build outputs — machine-specific, not needed in git
 android/local.properties
 android/.gradle/
