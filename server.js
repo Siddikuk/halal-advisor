@@ -387,12 +387,32 @@ HANBALI-SPECIFIC FINANCIAL RULINGS:
 - Hanbali madhab forms the basis for most GCC Islamic finance regulation`
 };
 
-function getMadhhabPrompt(madhab) {
+const LANG_INSTRUCTIONS = {
+  en: '',
+  ar: 'IMPORTANT: You MUST respond entirely in Arabic (العربية). Use formal Modern Standard Arabic.',
+  ur: 'IMPORTANT: You MUST respond entirely in Urdu (اردو). Use formal Urdu script.',
+  bn: 'IMPORTANT: You MUST respond entirely in Bengali (বাংলা). Use standard Bengali.',
+  tr: 'IMPORTANT: You MUST respond entirely in Turkish (Türkçe). Use formal Turkish.',
+  fr: 'IMPORTANT: You MUST respond entirely in French (Français). Use formal French.',
+  es: 'IMPORTANT: You MUST respond entirely in Spanish (Español). Use formal Spanish.',
+  pt: 'IMPORTANT: You MUST respond entirely in Portuguese (Português). Use formal Portuguese.',
+  de: 'IMPORTANT: You MUST respond entirely in German (Deutsch). Use formal German.',
+  id: 'IMPORTANT: You MUST respond entirely in Indonesian (Bahasa Indonesia). Use formal Indonesian.',
+  ms: 'IMPORTANT: You MUST respond entirely in Malay (Bahasa Melayu). Use formal Malaysian Malay.',
+  fa: 'IMPORTANT: You MUST respond entirely in Persian/Farsi (فارسی). Use formal Modern Persian.',
+  ha: 'IMPORTANT: You MUST respond entirely in Hausa. Use formal Hausa.',
+  sw: 'IMPORTANT: You MUST respond entirely in Swahili (Kiswahili). Use formal Swahili.',
+  so: 'IMPORTANT: You MUST respond entirely in Somali (Soomaali). Use formal Somali.'
+};
+
+function getMadhhabPrompt(madhab, lang) {
   const validMadhabs = ['shafii', 'hanafi', 'maliki', 'hanbali'];
   const m = validMadhabs.includes(madhab) ? madhab : 'shafii';
   const madhhabName = MADHAB_NAMES[m];
+  const langInstruction = LANG_INSTRUCTIONS[lang] || '';
 
   return `You are Amin (أمين), a trusted Halal financial advisor. The user follows the ${madhhabName} madhab. You advise Muslims in the United Kingdom. All monetary amounts are in British Pounds Sterling (£ GBP).
+${langInstruction ? '\n' + langInstruction + '\n' : ''}
 
 Always apply the ${madhhabName} madhab's specific rulings. When rulings differ between madhabs, clearly explain the ${madhhabName} position.
 
@@ -451,14 +471,15 @@ RESPONSE GUIDELINES
 - Never issue a fatwa — provide guidance and recommend verification with a scholar
 - If a question is outside finance, gently redirect to financial topics
 - Use £ for all amounts
-- Be concise but thorough`;
+- Be concise but thorough
+${langInstruction ? '- ' + langInstruction : ''}`;
 }
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Chat endpoint with streaming
 app.post('/api/chat', authMiddleware, async (req, res) => {
-  const { messages, madhab } = req.body;
+  const { messages, madhab, lang } = req.body;
   if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: 'Invalid messages format' });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'API key not configured.' });
 
@@ -471,7 +492,7 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
     const stream = client.messages.stream({
       model: 'claude-opus-4-6',
       max_tokens: 2048,
-      system: getMadhhabPrompt(madhab || 'shafii'),
+      system: getMadhhabPrompt(madhab || 'shafii', lang || 'en'),
       messages
     });
     for await (const event of stream) {
@@ -501,11 +522,12 @@ const SCREEN_SYSTEM = `You are a Sharia compliance analyst. You respond ONLY wit
 
 // Investment screening endpoint
 app.post('/api/screen', authMiddleware, async (req, res) => {
-  const { company, madhab } = req.body;
+  const { company, madhab, lang } = req.body;
   if (!company) return res.status(400).json({ error: 'Company name required' });
 
   const madhhabName = MADHAB_NAMES[madhab] || MADHAB_NAMES['shafii'];
   const m = ['shafii','hanafi','maliki','hanbali'].includes(madhab) ? madhab : 'shafii';
+  const langNote = LANG_INSTRUCTIONS[lang] ? `\n${LANG_INSTRUCTIONS[lang]}` : '';
 
   try {
     const response = await client.messages.create({
@@ -534,7 +556,8 @@ Respond with ONLY this JSON object (no markdown fences, no extra text):
 }
 
 verdict must be exactly one of: HALAL, HARAM, DOUBTFUL, UNKNOWN
-confidence must be exactly one of: HIGH, MEDIUM, LOW`
+confidence must be exactly one of: HIGH, MEDIUM, LOW
+${langNote}`
       }]
     });
 

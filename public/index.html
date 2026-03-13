@@ -101,6 +101,18 @@
     /* Trial expired modal */
     #trial-modal { position:fixed; inset:0; z-index:9998; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.6); }
     .trial-modal-card { background:white; border-radius:16px; padding:40px; max-width:440px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+
+    /* Language selector */
+    .lang-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .lang-btn { border:2px solid #e2e8f0; border-radius:8px; padding:8px 6px; cursor:pointer; background:white; font-size:.78rem; font-weight:600; transition:all .2s; text-align:center; line-height:1.3; }
+    .lang-btn:hover { border-color:var(--green-light); background:var(--green-pale); }
+    .lang-btn.active { border-color:var(--green); background:var(--green-pale); color:var(--green); }
+
+    /* RTL sidebar adjustments */
+    [dir="rtl"] #sidebar { left:auto; right:0; }
+    [dir="rtl"] #main { margin-left:0; margin-right:240px; }
+    [dir="rtl"] .nav-item { border-left:none; border-right:3px solid transparent; }
+    [dir="rtl"] .nav-item.active { border-right-color:var(--gold); }
   </style>
 </head>
 <body>
@@ -113,27 +125,27 @@
       <p style="color:#718096;font-size:.85rem;margin-top:6px;">Islamic Financial Guidance · GBP · All 4 Madhabs</p>
     </div>
     <div style="display:flex;border-bottom:2px solid #e2e8f0;margin-bottom:24px;">
-      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')" data-i18n="tab_signin">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')" data-i18n="tab_signup">Create Account</button>
     </div>
     <!-- Sign In -->
     <div id="form-signin">
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <div><label class="label">Email</label><input class="input" id="si-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
-        <div><label class="label">Password</label><input class="input" id="si-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/></div>
+        <div><label class="label" data-i18n="lbl_email">Email</label><input class="input" id="si-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
+        <div><label class="label" data-i18n="lbl_password">Password</label><input class="input" id="si-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/></div>
         <p id="si-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
-        <button class="btn-primary" id="si-btn" onclick="doLogin()" style="width:100%;padding:12px;font-size:1rem;">Sign In</button>
+        <button class="btn-primary" id="si-btn" onclick="doLogin()" style="width:100%;padding:12px;font-size:1rem;" data-i18n="btn_signin">Sign In</button>
         <p style="text-align:center;font-size:.8rem;color:#a0aec0;">Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:var(--green);font-weight:600;">Create one free</a></p>
       </div>
     </div>
     <!-- Sign Up -->
     <div id="form-signup" style="display:none;">
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <div><label class="label">Email</label><input class="input" id="su-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
-        <div><label class="label">Password <span style="font-weight:400;color:#a0aec0;">(min 8 characters)</span></label><input class="input" id="su-password" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
-        <div><label class="label">Confirm Password</label><input class="input" id="su-confirm" type="password" placeholder="••••••••" autocomplete="new-password" onkeypress="if(event.key==='Enter')doSignup()"/></div>
+        <div><label class="label" data-i18n="lbl_email">Email</label><input class="input" id="su-email" type="email" placeholder="your@email.com" autocomplete="email"/></div>
+        <div><label class="label" data-i18n="lbl_password">Password <span style="font-weight:400;color:#a0aec0;">(min 8 characters)</span></label><input class="input" id="su-password" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
+        <div><label class="label" data-i18n="lbl_confirm_password">Confirm Password</label><input class="input" id="su-confirm" type="password" placeholder="••••••••" autocomplete="new-password" onkeypress="if(event.key==='Enter')doSignup()"/></div>
         <p id="su-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
-        <button class="btn-primary" id="su-btn" onclick="doSignup()" style="width:100%;padding:12px;font-size:1rem;">Start 14-Day Free Trial</button>
+        <button class="btn-primary" id="su-btn" onclick="doSignup()" style="width:100%;padding:12px;font-size:1rem;" data-i18n="btn_signup">Start 14-Day Free Trial</button>
         <p style="font-size:.75rem;color:#a0aec0;text-align:center;">Free for 14 days. No credit card required.</p>
       </div>
     </div>
@@ -181,37 +193,37 @@
   <nav style="padding:12px 0; flex:1;">
     <div class="nav-item active" onclick="showSection('dashboard',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
-      Dashboard
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </div>
     <div class="nav-item" onclick="showSection('budget',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-      Budget Tracker
+      <span data-i18n="nav_budget">Budget Tracker</span>
     </div>
     <div class="nav-item" onclick="showSection('zakat',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      Zakat Calculator
+      <span data-i18n="nav_zakat">Zakat Calculator</span>
     </div>
     <div class="nav-item" onclick="showSection('investments',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-      Investment Screener
+      <span data-i18n="nav_investments">Investment Screener</span>
     </div>
     <div class="nav-item" onclick="showSection('chat',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-      AI Advisor (Amin)
+      <span data-i18n="nav_chat">AI Advisor (Amin)</span>
     </div>
     <div class="nav-item" onclick="showSection('debts',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
-      Debt Tracker
+      <span data-i18n="nav_debts">Debt Tracker</span>
     </div>
     <div class="nav-item" onclick="showSection('settings',this)">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
-      Settings
+      <span data-i18n="nav_settings">Settings</span>
     </div>
   </nav>
   <div style="padding:12px 16px; border-top:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:8px;">
     <div id="trial-banner" class="trial-banner" onclick="handleBannerClick()"></div>
     <div id="sidebar-user-email" style="color:rgba(255,255,255,0.5);font-size:.68rem;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
-    <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:6px;padding:6px;font-size:.75rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">Sign Out</button>
+    <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:6px;padding:6px;font-size:.75rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'" data-i18n="sign_out">Sign Out</button>
     <p style="color:rgba(255,255,255,0.25); font-size:0.65rem; text-align:center; margin:0;">Guidance only. Consult a scholar for fatwas.</p>
   </div>
 </div>
@@ -530,14 +542,14 @@
 
   <!-- ═══ SETTINGS ═══ -->
   <section id="sec-settings" class="hidden">
-    <div class="section-title">Settings</div>
-    <p class="section-sub">Configure your madhab, name, and gold/silver prices for accurate calculations.</p>
+    <div class="section-title" data-i18n="nav_settings">Settings</div>
+    <p class="section-sub" data-i18n="settings_sub">Configure your madhab, name, and gold/silver prices for accurate calculations.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
       <div style="display:flex;flex-direction:column;gap:20px;">
 
         <!-- Madhab Selector -->
         <div class="card">
-          <h3 style="font-weight:700;margin-bottom:4px;color:var(--green);">Select Your Madhab</h3>
+          <h3 style="font-weight:700;margin-bottom:4px;color:var(--green);" data-i18n="lbl_select_madhab">Select Your Madhab</h3>
           <p style="font-size:.82rem;color:#718096;margin-bottom:16px;">All zakat rules, AI advice, and financial guidance will follow your chosen madhab.</p>
           <div class="madhab-grid">
 
@@ -576,28 +588,51 @@
           </div>
         </div>
 
+        <!-- Language Selector -->
+        <div class="card">
+          <h3 style="font-weight:700;margin-bottom:4px;color:var(--green);" data-i18n="lbl_language">Language</h3>
+          <p style="font-size:.82rem;color:#718096;margin-bottom:16px;" data-i18n="lang_sub">AI advisor Amin will respond in your chosen language.</p>
+          <div class="lang-grid">
+            <button class="lang-btn active" data-lang="en" onclick="selectLanguage('en')">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="ar" onclick="selectLanguage('ar')">🇸🇦 العربية</button>
+            <button class="lang-btn" data-lang="ur" onclick="selectLanguage('ur')">🇵🇰 اردو</button>
+            <button class="lang-btn" data-lang="bn" onclick="selectLanguage('bn')">🇧🇩 বাংলা</button>
+            <button class="lang-btn" data-lang="tr" onclick="selectLanguage('tr')">🇹🇷 Türkçe</button>
+            <button class="lang-btn" data-lang="fr" onclick="selectLanguage('fr')">🇫🇷 Français</button>
+            <button class="lang-btn" data-lang="es" onclick="selectLanguage('es')">🇪🇸 Español</button>
+            <button class="lang-btn" data-lang="pt" onclick="selectLanguage('pt')">🇧🇷 Português</button>
+            <button class="lang-btn" data-lang="de" onclick="selectLanguage('de')">🇩🇪 Deutsch</button>
+            <button class="lang-btn" data-lang="id" onclick="selectLanguage('id')">🇮🇩 Indonesia</button>
+            <button class="lang-btn" data-lang="ms" onclick="selectLanguage('ms')">🇲🇾 Melayu</button>
+            <button class="lang-btn" data-lang="fa" onclick="selectLanguage('fa')">🇮🇷 فارسی</button>
+            <button class="lang-btn" data-lang="ha" onclick="selectLanguage('ha')">🇳🇬 Hausa</button>
+            <button class="lang-btn" data-lang="sw" onclick="selectLanguage('sw')">🇰🇪 Kiswahili</button>
+            <button class="lang-btn" data-lang="so" onclick="selectLanguage('so')">🇸🇴 Soomaali</button>
+          </div>
+        </div>
+
         <!-- Personal -->
         <div class="card">
-          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);">Personal Settings</h3>
+          <h3 style="font-weight:700;margin-bottom:16px;color:var(--green);" data-i18n="lbl_personal_settings">Personal Settings</h3>
           <div style="display:flex;flex-direction:column;gap:14px;">
-            <div><label class="label">Your Name</label><input class="input" id="settings-name" placeholder="Your name"/></div>
+            <div><label class="label" data-i18n="lbl_your_name">Your Name</label><input class="input" id="settings-name" placeholder="Your name"/></div>
             <div>
-              <label class="label">Gold Price (£ per gram)</label>
+              <label class="label" data-i18n="lbl_gold_price">Gold Price (£ per gram)</label>
               <input class="input" id="settings-gold" type="number" placeholder="75" step="0.01"/>
               <p style="font-size:.75rem;color:#718096;margin-top:3px;">Check Google "gold price per gram GBP" for today's rate. Used for nisab calculation.</p>
             </div>
             <div>
-              <label class="label">Silver Price (£ per gram)</label>
+              <label class="label" data-i18n="lbl_silver_price">Silver Price (£ per gram)</label>
               <input class="input" id="settings-silver" type="number" placeholder="0.72" step="0.001"/>
               <p style="font-size:.75rem;color:#718096;margin-top:3px;">Used for Hanafi/Hanbali silver nisab calculation. Check live silver prices.</p>
             </div>
-            <button class="btn-primary" onclick="saveSettings()">Save All Settings</button>
-            <div id="settings-saved" class="hidden" style="background:#d1fae5;color:#065f46;border-radius:8px;padding:10px;text-align:center;font-size:.85rem;font-weight:600;">✓ Settings saved!</div>
+            <button class="btn-primary" onclick="saveSettings()" data-i18n="btn_save_settings">Save All Settings</button>
+            <div id="settings-saved" class="hidden" style="background:#d1fae5;color:#065f46;border-radius:8px;padding:10px;text-align:center;font-size:.85rem;font-weight:600;" data-i18n="msg_settings_saved">✓ Settings saved!</div>
             <div id="subscription-section" style="margin-top:8px;padding-top:16px;border-top:1px solid #e2e8f0;">
-              <p style="font-size:.82rem;font-weight:600;color:#4a5568;margin-bottom:8px;">Subscription</p>
+              <p style="font-size:.82rem;font-weight:600;color:#4a5568;margin-bottom:8px;" data-i18n="lbl_subscription">Subscription</p>
               <div id="subscription-status-display" style="font-size:.82rem;color:#718096;margin-bottom:8px;"></div>
-              <button id="manage-sub-btn" onclick="openPortal()" class="btn-outline" style="width:100%;font-size:.85rem;display:none;">Manage Subscription</button>
-              <button id="upgrade-settings-btn" onclick="showTrialModal()" class="btn-primary" style="width:100%;font-size:.85rem;display:none;">Upgrade — £4.99/month</button>
+              <button id="manage-sub-btn" onclick="openPortal()" class="btn-outline" style="width:100%;font-size:.85rem;display:none;" data-i18n="btn_manage_sub">Manage Subscription</button>
+              <button id="upgrade-settings-btn" onclick="showTrialModal()" class="btn-primary" style="width:100%;font-size:.85rem;display:none;" data-i18n="btn_upgrade">Upgrade — £4.99/month</button>
             </div>
           </div>
         </div>
@@ -750,6 +785,7 @@ let data = {
   settings: {
     name: 'Brother/Sister',
     madhab: 'shafii',
+    language: 'en',
     goldPriceGBP: 75,
     silverPriceGBP: 0.72
   }
@@ -827,6 +863,7 @@ async function doSignup() {
 
 async function afterAuth(showSuccessBanner) {
   await loadUserDataFromServer();
+  setLanguage(data.settings.language || 'en');
   document.getElementById('auth-overlay').style.display = 'none';
   updateTrialBanner();
   renderAll();
@@ -845,7 +882,8 @@ function logout() {
   authToken = null;
   currentUser = null;
   localStorage.removeItem('halalAuthToken');
-  data = { transactions: [], debts: [], screenings: [], chatHistory: [], settings: { name: 'Brother/Sister', madhab: 'shafii', goldPriceGBP: 75, silverPriceGBP: 0.72 } };
+  data = { transactions: [], debts: [], screenings: [], chatHistory: [], settings: { name: 'Brother/Sister', madhab: 'shafii', language: 'en', goldPriceGBP: 75, silverPriceGBP: 0.72 } };
+  setLanguage('en');
   document.getElementById('trial-banner').style.display = 'none';
   document.getElementById('sidebar-user-email').textContent = '';
   document.getElementById('auth-overlay').style.display = 'flex';
@@ -1323,7 +1361,7 @@ async function screenInvestment() {
   try {
     const res = await fetch('/api/screen', {
       method:'POST', headers: getHeaders(),
-      body: JSON.stringify({ company, madhab: getMadhab() })
+      body: JSON.stringify({ company, madhab: getMadhab(), lang: data.settings.language || 'en' })
     });
     if (!res.ok) throw new Error(await res.text());
     const d = await res.json();
@@ -1399,7 +1437,7 @@ async function sendChat() {
   try {
     const res = await fetch('/api/chat', {
       method:'POST', headers: getHeaders(),
-      body: JSON.stringify({ messages: data.chatHistory, madhab: getMadhab() })
+      body: JSON.stringify({ messages: data.chatHistory, madhab: getMadhab(), lang: data.settings.language || 'en' })
     });
     if (!res.ok) throw new Error(`Server error: ${res.status}`);
     const reader = res.body.getReader(); const decoder = new TextDecoder();
@@ -1494,10 +1532,258 @@ function saveSettings() {
 }
 
 // ─────────────────────────────────────────────
+// MULTI-LANGUAGE SUPPORT
+// ─────────────────────────────────────────────
+
+const TRANSLATIONS = {
+  en: {
+    nav_dashboard:'Dashboard', nav_budget:'Budget Tracker', nav_zakat:'Zakat Calculator',
+    nav_investments:'Investment Screener', nav_chat:'AI Advisor (Amin)', nav_debts:'Debt Tracker',
+    nav_settings:'Settings', sign_out:'Sign Out', tab_signin:'Sign In', tab_signup:'Create Account',
+    lbl_email:'Email', lbl_password:'Password', lbl_confirm_password:'Confirm Password',
+    btn_signin:'Sign In', btn_signup:'Start 14-Day Free Trial',
+    lbl_select_madhab:'Select Your Madhab', lbl_language:'Language',
+    lang_sub:'AI advisor Amin will respond in your chosen language.',
+    lbl_personal_settings:'Personal Settings', lbl_your_name:'Your Name',
+    lbl_gold_price:'Gold Price (£ per gram)', lbl_silver_price:'Silver Price (£ per gram)',
+    btn_save_settings:'Save All Settings', msg_settings_saved:'✓ Settings saved!',
+    lbl_subscription:'Subscription', btn_manage_sub:'Manage Subscription',
+    btn_upgrade:'Upgrade — £4.99/month', settings_sub:'Configure your madhab, name, and gold/silver prices for accurate calculations.'
+  },
+  ar: {
+    nav_dashboard:'لوحة التحكم', nav_budget:'تتبع الميزانية', nav_zakat:'حاسبة الزكاة',
+    nav_investments:'فحص الاستثمارات', nav_chat:'المستشار أمين', nav_debts:'تتبع الديون',
+    nav_settings:'الإعدادات', sign_out:'تسجيل الخروج', tab_signin:'تسجيل الدخول', tab_signup:'إنشاء حساب',
+    lbl_email:'البريد الإلكتروني', lbl_password:'كلمة المرور', lbl_confirm_password:'تأكيد كلمة المرور',
+    btn_signin:'تسجيل الدخول', btn_signup:'ابدأ النسخة التجريبية المجانية',
+    lbl_select_madhab:'اختر مذهبك', lbl_language:'اللغة',
+    lang_sub:'سيرد المستشار أمين بلغتك المختارة.',
+    lbl_personal_settings:'الإعدادات الشخصية', lbl_your_name:'اسمك',
+    lbl_gold_price:'سعر الذهب (£ للجرام)', lbl_silver_price:'سعر الفضة (£ للجرام)',
+    btn_save_settings:'حفظ الإعدادات', msg_settings_saved:'✓ تم حفظ الإعدادات!',
+    lbl_subscription:'الاشتراك', btn_manage_sub:'إدارة الاشتراك',
+    btn_upgrade:'ترقية — £4.99/شهر', settings_sub:'اضبط مذهبك واسمك وأسعار الذهب والفضة.'
+  },
+  ur: {
+    nav_dashboard:'ڈیش بورڈ', nav_budget:'بجٹ ٹریکر', nav_zakat:'زکوٰۃ کیلکولیٹر',
+    nav_investments:'سرمایہ کاری اسکریننگ', nav_chat:'مشیر امین', nav_debts:'قرض ٹریکر',
+    nav_settings:'ترتیبات', sign_out:'سائن آؤٹ', tab_signin:'سائن ان', tab_signup:'اکاؤنٹ بنائیں',
+    lbl_email:'ای میل', lbl_password:'پاس ورڈ', lbl_confirm_password:'پاس ورڈ کی تصدیق',
+    btn_signin:'سائن ان', btn_signup:'14 دن کی مفت آزمائش',
+    lbl_select_madhab:'اپنا مذہب منتخب کریں', lbl_language:'زبان',
+    lang_sub:'مشیر امین آپ کی منتخب زبان میں جواب دے گا۔',
+    lbl_personal_settings:'ذاتی ترتیبات', lbl_your_name:'آپ کا نام',
+    lbl_gold_price:'سونے کی قیمت (£ فی گرام)', lbl_silver_price:'چاندی کی قیمت (£ فی گرام)',
+    btn_save_settings:'ترتیبات محفوظ کریں', msg_settings_saved:'✓ ترتیبات محفوظ ہو گئیں!',
+    lbl_subscription:'سبسکرپشن', btn_manage_sub:'سبسکرپشن منظم کریں',
+    btn_upgrade:'اپ گریڈ — £4.99/ماہ', settings_sub:'اپنا مذہب، نام اور سونے چاندی کی قیمت درج کریں۔'
+  },
+  bn: {
+    nav_dashboard:'ড্যাশবোর্ড', nav_budget:'বাজেট ট্র্যাকার', nav_zakat:'যাকাত ক্যালকুলেটর',
+    nav_investments:'বিনিয়োগ স্ক্রিনার', nav_chat:'AI উপদেষ্টা আমিন', nav_debts:'ঋণ ট্র্যাকার',
+    nav_settings:'সেটিংস', sign_out:'সাইন আউট', tab_signin:'সাইন ইন', tab_signup:'অ্যাকাউন্ট তৈরি করুন',
+    lbl_email:'ইমেইল', lbl_password:'পাসওয়ার্ড', lbl_confirm_password:'পাসওয়ার্ড নিশ্চিত করুন',
+    btn_signin:'সাইন ইন', btn_signup:'১৪ দিনের বিনামূল্যে ট্রায়াল',
+    lbl_select_madhab:'আপনার মাযহাব বেছে নিন', lbl_language:'ভাষা',
+    lang_sub:'AI উপদেষ্টা আমিন আপনার ভাষায় উত্তর দেবেন।',
+    lbl_personal_settings:'ব্যক্তিগত সেটিংস', lbl_your_name:'আপনার নাম',
+    lbl_gold_price:'সোনার দাম (£ প্রতি গ্রাম)', lbl_silver_price:'রূপার দাম (£ প্রতি গ্রাম)',
+    btn_save_settings:'সব সেটিংস সেভ করুন', msg_settings_saved:'✓ সেটিংস সেভ হয়েছে!',
+    lbl_subscription:'সাবস্ক্রিপশন', btn_manage_sub:'সাবস্ক্রিপশন পরিচালনা',
+    btn_upgrade:'আপগ্রেড — £4.99/মাস', settings_sub:'আপনার মাযহাব, নাম ও সোনা-রূপার দাম নির্ধারণ করুন।'
+  },
+  tr: {
+    nav_dashboard:'Gösterge Paneli', nav_budget:'Bütçe Takibi', nav_zakat:'Zekat Hesaplayıcı',
+    nav_investments:'Yatırım Tarayıcı', nav_chat:'AI Danışman (Emin)', nav_debts:'Borç Takibi',
+    nav_settings:'Ayarlar', sign_out:'Çıkış Yap', tab_signin:'Giriş Yap', tab_signup:'Hesap Oluştur',
+    lbl_email:'E-posta', lbl_password:'Şifre', lbl_confirm_password:'Şifreyi Onayla',
+    btn_signin:'Giriş Yap', btn_signup:'14 Günlük Ücretsiz Deneme',
+    lbl_select_madhab:'Mezhebinizi Seçin', lbl_language:'Dil',
+    lang_sub:'AI danışman Emin seçtiğiniz dilde yanıt verecek.',
+    lbl_personal_settings:'Kişisel Ayarlar', lbl_your_name:'Adınız',
+    lbl_gold_price:'Altın Fiyatı (£/gram)', lbl_silver_price:'Gümüş Fiyatı (£/gram)',
+    btn_save_settings:'Tüm Ayarları Kaydet', msg_settings_saved:'✓ Ayarlar kaydedildi!',
+    lbl_subscription:'Abonelik', btn_manage_sub:'Aboneliği Yönet',
+    btn_upgrade:'Yükselt — £4.99/ay', settings_sub:'Mezhebinizi, adınızı ve altın/gümüş fiyatlarını yapılandırın.'
+  },
+  fr: {
+    nav_dashboard:'Tableau de bord', nav_budget:'Suivi du budget', nav_zakat:'Calculateur de Zakat',
+    nav_investments:'Examen des investissements', nav_chat:'Conseiller IA (Amin)', nav_debts:'Suivi des dettes',
+    nav_settings:'Paramètres', sign_out:'Se déconnecter', tab_signin:'Se connecter', tab_signup:'Créer un compte',
+    lbl_email:'E-mail', lbl_password:'Mot de passe', lbl_confirm_password:'Confirmer le mot de passe',
+    btn_signin:'Se connecter', btn_signup:'Essai gratuit de 14 jours',
+    lbl_select_madhab:'Sélectionnez votre Madhab', lbl_language:'Langue',
+    lang_sub:"Le conseiller IA Amin répondra dans votre langue.",
+    lbl_personal_settings:'Paramètres personnels', lbl_your_name:'Votre nom',
+    lbl_gold_price:"Prix de l'or (£/gramme)", lbl_silver_price:"Prix de l'argent (£/gramme)",
+    btn_save_settings:'Enregistrer les paramètres', msg_settings_saved:'✓ Paramètres sauvegardés!',
+    lbl_subscription:'Abonnement', btn_manage_sub:"Gérer l'abonnement",
+    btn_upgrade:'Passer à Pro — £4.99/mois', settings_sub:'Configurez votre madhab, nom et prix des métaux précieux.'
+  },
+  es: {
+    nav_dashboard:'Panel de control', nav_budget:'Rastreador de presupuesto', nav_zakat:'Calculadora de Zakat',
+    nav_investments:'Examinador de inversiones', nav_chat:'Asesor IA (Amín)', nav_debts:'Rastreador de deudas',
+    nav_settings:'Configuración', sign_out:'Cerrar sesión', tab_signin:'Iniciar sesión', tab_signup:'Crear cuenta',
+    lbl_email:'Correo electrónico', lbl_password:'Contraseña', lbl_confirm_password:'Confirmar contraseña',
+    btn_signin:'Iniciar sesión', btn_signup:'Prueba gratuita de 14 días',
+    lbl_select_madhab:'Selecciona tu Madhab', lbl_language:'Idioma',
+    lang_sub:'El asesor IA Amín responderá en tu idioma.',
+    lbl_personal_settings:'Configuración personal', lbl_your_name:'Tu nombre',
+    lbl_gold_price:'Precio del oro (£/gramo)', lbl_silver_price:'Precio de la plata (£/gramo)',
+    btn_save_settings:'Guardar configuración', msg_settings_saved:'✓ ¡Configuración guardada!',
+    lbl_subscription:'Suscripción', btn_manage_sub:'Gestionar suscripción',
+    btn_upgrade:'Actualizar — £4.99/mes', settings_sub:'Configura tu madhab, nombre y precios de metales preciosos.'
+  },
+  pt: {
+    nav_dashboard:'Painel', nav_budget:'Rastreador de orçamento', nav_zakat:'Calculadora de Zakat',
+    nav_investments:'Triagem de investimentos', nav_chat:'Consultor IA (Amim)', nav_debts:'Rastreador de dívidas',
+    nav_settings:'Configurações', sign_out:'Sair', tab_signin:'Entrar', tab_signup:'Criar conta',
+    lbl_email:'E-mail', lbl_password:'Senha', lbl_confirm_password:'Confirmar senha',
+    btn_signin:'Entrar', btn_signup:'Teste gratuito de 14 dias',
+    lbl_select_madhab:'Selecione seu Madhab', lbl_language:'Idioma',
+    lang_sub:'O consultor IA Amim responderá no seu idioma.',
+    lbl_personal_settings:'Configurações pessoais', lbl_your_name:'Seu nome',
+    lbl_gold_price:'Preço do ouro (£/grama)', lbl_silver_price:'Preço da prata (£/grama)',
+    btn_save_settings:'Salvar configurações', msg_settings_saved:'✓ Configurações salvas!',
+    lbl_subscription:'Assinatura', btn_manage_sub:'Gerenciar assinatura',
+    btn_upgrade:'Atualizar — £4.99/mês', settings_sub:'Configure seu madhab, nome e preços dos metais preciosos.'
+  },
+  de: {
+    nav_dashboard:'Übersicht', nav_budget:'Budgetverfolgung', nav_zakat:'Zakat-Rechner',
+    nav_investments:'Investmentprüfung', nav_chat:'KI-Berater (Amin)', nav_debts:'Schuldentracker',
+    nav_settings:'Einstellungen', sign_out:'Abmelden', tab_signin:'Anmelden', tab_signup:'Konto erstellen',
+    lbl_email:'E-Mail', lbl_password:'Passwort', lbl_confirm_password:'Passwort bestätigen',
+    btn_signin:'Anmelden', btn_signup:'14-tägige Testversion starten',
+    lbl_select_madhab:'Wählen Sie Ihren Madhab', lbl_language:'Sprache',
+    lang_sub:'Der KI-Berater Amin antwortet in Ihrer gewählten Sprache.',
+    lbl_personal_settings:'Persönliche Einstellungen', lbl_your_name:'Ihr Name',
+    lbl_gold_price:'Goldpreis (£/Gramm)', lbl_silver_price:'Silberpreis (£/Gramm)',
+    btn_save_settings:'Alle Einstellungen speichern', msg_settings_saved:'✓ Einstellungen gespeichert!',
+    lbl_subscription:'Abonnement', btn_manage_sub:'Abonnement verwalten',
+    btn_upgrade:'Upgraden — £4.99/Monat', settings_sub:'Konfigurieren Sie Ihren Madhab, Namen und Edelmetallpreise.'
+  },
+  id: {
+    nav_dashboard:'Dasbor', nav_budget:'Pelacak Anggaran', nav_zakat:'Kalkulator Zakat',
+    nav_investments:'Pemeriksa Investasi', nav_chat:'Penasihat AI (Amin)', nav_debts:'Pelacak Utang',
+    nav_settings:'Pengaturan', sign_out:'Keluar', tab_signin:'Masuk', tab_signup:'Buat Akun',
+    lbl_email:'Email', lbl_password:'Kata Sandi', lbl_confirm_password:'Konfirmasi Kata Sandi',
+    btn_signin:'Masuk', btn_signup:'Mulai Uji Coba Gratis 14 Hari',
+    lbl_select_madhab:'Pilih Mazhab Anda', lbl_language:'Bahasa',
+    lang_sub:'Penasihat AI Amin akan merespons dalam bahasa Anda.',
+    lbl_personal_settings:'Pengaturan Pribadi', lbl_your_name:'Nama Anda',
+    lbl_gold_price:'Harga Emas (£/gram)', lbl_silver_price:'Harga Perak (£/gram)',
+    btn_save_settings:'Simpan Semua Pengaturan', msg_settings_saved:'✓ Pengaturan tersimpan!',
+    lbl_subscription:'Langganan', btn_manage_sub:'Kelola Langganan',
+    btn_upgrade:'Tingkatkan — £4.99/bulan', settings_sub:'Konfigurasi mazhab, nama, dan harga emas/perak Anda.'
+  },
+  ms: {
+    nav_dashboard:'Papan Pemuka', nav_budget:'Penjejak Bajet', nav_zakat:'Kalkulator Zakat',
+    nav_investments:'Pemeriksa Pelaburan', nav_chat:'Penasihat AI (Amin)', nav_debts:'Penjejak Hutang',
+    nav_settings:'Tetapan', sign_out:'Log Keluar', tab_signin:'Log Masuk', tab_signup:'Cipta Akaun',
+    lbl_email:'E-mel', lbl_password:'Kata Laluan', lbl_confirm_password:'Sahkan Kata Laluan',
+    btn_signin:'Log Masuk', btn_signup:'Cuba Percuma 14 Hari',
+    lbl_select_madhab:'Pilih Mazhab Anda', lbl_language:'Bahasa',
+    lang_sub:'Penasihat AI Amin akan menjawab dalam bahasa anda.',
+    lbl_personal_settings:'Tetapan Peribadi', lbl_your_name:'Nama Anda',
+    lbl_gold_price:'Harga Emas (£/gram)', lbl_silver_price:'Harga Perak (£/gram)',
+    btn_save_settings:'Simpan Semua Tetapan', msg_settings_saved:'✓ Tetapan disimpan!',
+    lbl_subscription:'Langganan', btn_manage_sub:'Urus Langganan',
+    btn_upgrade:'Naik Taraf — £4.99/bulan', settings_sub:'Konfigurasikan mazhab, nama dan harga emas/perak anda.'
+  },
+  fa: {
+    nav_dashboard:'داشبورد', nav_budget:'ردیاب بودجه', nav_zakat:'ماشین‌حساب زکات',
+    nav_investments:'بررسی سرمایه‌گذاری', nav_chat:'مشاور امین', nav_debts:'ردیاب بدهی',
+    nav_settings:'تنظیمات', sign_out:'خروج', tab_signin:'ورود', tab_signup:'ایجاد حساب',
+    lbl_email:'ایمیل', lbl_password:'رمز عبور', lbl_confirm_password:'تأیید رمز عبور',
+    btn_signin:'ورود', btn_signup:'شروع آزمایش رایگان ۱۴ روزه',
+    lbl_select_madhab:'مذهب خود را انتخاب کنید', lbl_language:'زبان',
+    lang_sub:'مشاور هوش مصنوعی امین به زبان شما پاسخ می‌دهد.',
+    lbl_personal_settings:'تنظیمات شخصی', lbl_your_name:'نام شما',
+    lbl_gold_price:'قیمت طلا (£ در هر گرم)', lbl_silver_price:'قیمت نقره (£ در هر گرم)',
+    btn_save_settings:'ذخیره تنظیمات', msg_settings_saved:'✓ تنظیمات ذخیره شد!',
+    lbl_subscription:'اشتراک', btn_manage_sub:'مدیریت اشتراک',
+    btn_upgrade:'ارتقا — £4.99/ماه', settings_sub:'مذهب، نام و قیمت طلا/نقره خود را تنظیم کنید.'
+  },
+  ha: {
+    nav_dashboard:'Allon Kula', nav_budget:'Mai Bin Kasafin Kuɗi', nav_zakat:'Lissafin Zakka',
+    nav_investments:'Duba Zuba Jari', nav_chat:'Mai Shawara Amin', nav_debts:'Mai Bin Bashi',
+    nav_settings:'Saiti', sign_out:'Fita', tab_signin:'Shiga', tab_signup:'Ƙirƙiri Asusun',
+    lbl_email:'Imel', lbl_password:'Kalmar Sirri', lbl_confirm_password:'Tabbatar da Kalmar Sirri',
+    btn_signin:'Shiga', btn_signup:'Fara Gwaji Kyauta Kwanaki 14',
+    lbl_select_madhab:'Zaɓi Mazhabinka', lbl_language:'Yare',
+    lang_sub:'Mai shawara AI Amin zai amsa da yarenkà.',
+    lbl_personal_settings:'Saitunan Sirri', lbl_your_name:'Sunanka',
+    lbl_gold_price:'Farashin Zinariya (£/gram)', lbl_silver_price:'Farashin Azurfa (£/gram)',
+    btn_save_settings:'Adana Duk Saiti', msg_settings_saved:'✓ An adana saiti!',
+    lbl_subscription:'Biyan Kuɗi', btn_manage_sub:'Sarrafa Biyan Kuɗi',
+    btn_upgrade:'Haɓaka — £4.99/wata', settings_sub:'Tsara mazhabinka, sunanka da farashin ƙarfe masu daraja.'
+  },
+  sw: {
+    nav_dashboard:'Dashibodi', nav_budget:'Kifuatilio cha Bajeti', nav_zakat:'Kikokotoo cha Zakat',
+    nav_investments:'Ukaguzi wa Uwekezaji', nav_chat:'Mshauri AI (Amin)', nav_debts:'Kifuatilio cha Madeni',
+    nav_settings:'Mipangilio', sign_out:'Toka', tab_signin:'Ingia', tab_signup:'Fungua Akaunti',
+    lbl_email:'Barua pepe', lbl_password:'Nenosiri', lbl_confirm_password:'Thibitisha Nenosiri',
+    btn_signin:'Ingia', btn_signup:'Anza Majaribio ya Siku 14 Bure',
+    lbl_select_madhab:'Chagua Madhehebu Yako', lbl_language:'Lugha',
+    lang_sub:'Mshauri AI Amin atajibu kwa lugha yako.',
+    lbl_personal_settings:'Mipangilio ya Kibinafsi', lbl_your_name:'Jina Lako',
+    lbl_gold_price:'Bei ya Dhahabu (£/gramu)', lbl_silver_price:'Bei ya Fedha (£/gramu)',
+    btn_save_settings:'Hifadhi Mipangilio Yote', msg_settings_saved:'✓ Mipangilio imehifadhiwa!',
+    lbl_subscription:'Usajili', btn_manage_sub:'Simamia Usajili',
+    btn_upgrade:'Boresha — £4.99/mwezi', settings_sub:'Sanidi madhehebu yako, jina na bei za dhahabu/fedha.'
+  },
+  so: {
+    nav_dashboard:'Wajiga Xogta', nav_budget:'Raadraaca Miisaaniyada', nav_zakat:'Xisaabiyaha Zakada',
+    nav_investments:'Baaritaanka Maalgashiga', nav_chat:'Khabiir AI (Amin)', nav_debts:'Raadraaca Deymaha',
+    nav_settings:'Xulashooyinka', sign_out:'Ka Bax', tab_signin:'Gal', tab_signup:'Samee Xisaab',
+    lbl_email:'Iimeel', lbl_password:'Furaha', lbl_confirm_password:'Xaqiiji Furaha',
+    btn_signin:'Gal', btn_signup:'Bilow 14 Cisho Bilaash',
+    lbl_select_madhab:'Dooro Madhhabkaaga', lbl_language:'Luqad',
+    lang_sub:'Khabiirka AI Amin ayaa kugu jawaabi doona luqaddaada.',
+    lbl_personal_settings:'Xulashooyinka Shakhsiga', lbl_your_name:'Magacaaga',
+    lbl_gold_price:'Qiimaha Dahabka (£/giraam)', lbl_silver_price:'Qiimaha Lacagta Caddaanka (£/giraam)',
+    btn_save_settings:'Keydi Dhammaan Xulashooyinka', msg_settings_saved:'✓ Xulashooyinku waa la keydsaday!',
+    lbl_subscription:'Rukhsadda', btn_manage_sub:'Maamul Rukhsadda',
+    btn_upgrade:'Kor u qaad — £4.99/bil', settings_sub:'Habee madhhabkaaga, magacaaga iyo qiimaha biraha qaaliga ah.'
+  }
+};
+
+const LANG_NAMES = {
+  en:'English', ar:'العربية', ur:'اردو', bn:'বাংলা',
+  tr:'Türkçe', fr:'Français', es:'Español', pt:'Português', de:'Deutsch',
+  id:'Indonesian', ms:'Melayu', fa:'فارسی', ha:'Hausa', sw:'Kiswahili', so:'Soomaali'
+};
+
+function setLanguage(lang) {
+  const valid = ['en','ar','ur','bn','tr','fr','es','pt','de','id','ms','fa','ha','sw','so'];
+  const l = valid.includes(lang) ? lang : 'en';
+  data.settings.language = l;
+  const t = TRANSLATIONS[l] || TRANSLATIONS.en;
+  const isRTL = l === 'ar' || l === 'ur' || l === 'fa';
+  document.documentElement.lang = l;
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  // Apply translations to tagged elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  // Update language button active state
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === l);
+  });
+}
+
+function selectLanguage(lang) {
+  setLanguage(lang);
+  saveData();
+}
+
+// ─────────────────────────────────────────────
 // RENDER ALL
 // ─────────────────────────────────────────────
 
 function renderAll() {
+  setLanguage(data.settings.language || 'en');
   updateMadhabUI();
   renderDashboard();
   renderRecentTxns();
