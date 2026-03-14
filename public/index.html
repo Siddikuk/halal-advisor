@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Halal Financial Advisor</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
@@ -135,6 +135,7 @@
         <div><label class="label" data-i18n="lbl_password">Password</label><input class="input" id="si-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/></div>
         <p id="si-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
         <button class="btn-primary" id="si-btn" onclick="doLogin()" style="width:100%;padding:12px;font-size:1rem;" data-i18n="btn_signin">Sign In</button>
+        <p style="text-align:center;font-size:.8rem;margin-top:2px;"><a href="#" onclick="showForgotPassword();return false;" style="color:var(--green);font-weight:500;">Forgot password?</a></p>
         <p style="text-align:center;font-size:.8rem;color:#a0aec0;">Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:var(--green);font-weight:600;">Create one free</a></p>
       </div>
     </div>
@@ -147,6 +148,28 @@
         <p id="su-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
         <button class="btn-primary" id="su-btn" onclick="doSignup()" style="width:100%;padding:12px;font-size:1rem;" data-i18n="btn_signup">Start 14-Day Free Trial</button>
         <p style="font-size:.75rem;color:#a0aec0;text-align:center;">Free for 14 days. No credit card required.</p>
+      </div>
+    </div>
+    <!-- Forgot Password -->
+    <div id="form-forgot" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:.85rem;color:#4a5568;line-height:1.5;">Enter your email address and we'll send you a link to reset your password.</p>
+        <div><label class="label">Email</label><input class="input" id="fp-email" type="email" placeholder="your@email.com" autocomplete="email" onkeypress="if(event.key==='Enter')doForgotPassword()"/></div>
+        <p id="fp-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
+        <p id="fp-success" style="color:#276749;font-size:.82rem;display:none;padding:8px 12px;background:#f0fff4;border-radius:6px;"></p>
+        <button class="btn-primary" id="fp-btn" onclick="doForgotPassword()" style="width:100%;padding:12px;font-size:1rem;">Send Reset Link</button>
+        <p style="text-align:center;font-size:.8rem;"><a href="#" onclick="showSignIn();return false;" style="color:var(--green);font-weight:500;">← Back to Sign In</a></p>
+      </div>
+    </div>
+    <!-- Reset Password (shown when URL has ?resetToken=…) -->
+    <div id="form-reset" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:.85rem;color:#4a5568;line-height:1.5;">Enter your new password below.</p>
+        <div><label class="label">New Password <span style="font-weight:400;color:#a0aec0;">(min 8 characters)</span></label><input class="input" id="rp-password" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
+        <div><label class="label">Confirm New Password</label><input class="input" id="rp-confirm" type="password" placeholder="••••••••" autocomplete="new-password" onkeypress="if(event.key==='Enter')doResetPassword()"/></div>
+        <p id="rp-error" style="color:#e53e3e;font-size:.82rem;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;"></p>
+        <p id="rp-success" style="color:#276749;font-size:.82rem;display:none;padding:8px 12px;background:#f0fff4;border-radius:6px;"></p>
+        <button class="btn-primary" id="rp-btn" onclick="doResetPassword()" style="width:100%;padding:12px;font-size:1rem;">Set New Password</button>
       </div>
     </div>
   </div>
@@ -863,6 +886,80 @@ async function doSignup() {
   } finally { btn.disabled = false; btn.textContent = t.btn_signup; }
 }
 
+function showForgotPassword() {
+  document.getElementById('form-signin').style.display = 'none';
+  document.getElementById('form-signup').style.display = 'none';
+  document.getElementById('form-forgot').style.display = '';
+  document.getElementById('form-reset').style.display = 'none';
+  document.getElementById('tab-signin').classList.remove('active');
+  document.getElementById('tab-signup').classList.remove('active');
+  document.getElementById('fp-email').value = '';
+  document.getElementById('fp-error').style.display = 'none';
+  document.getElementById('fp-success').style.display = 'none';
+}
+
+function showSignIn() {
+  document.getElementById('form-forgot').style.display = 'none';
+  document.getElementById('form-reset').style.display = 'none';
+  document.getElementById('form-signup').style.display = 'none';
+  document.getElementById('form-signin').style.display = '';
+  document.getElementById('tab-signin').classList.add('active');
+  document.getElementById('tab-signup').classList.remove('active');
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('fp-email').value.trim();
+  const errEl = document.getElementById('fp-error');
+  const successEl = document.getElementById('fp-success');
+  const btn = document.getElementById('fp-btn');
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await fetch('/api/auth/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+    successEl.textContent = 'If an account exists for that email, a reset link has been sent. Check your inbox (and spam folder).';
+    successEl.style.display = 'block';
+    btn.textContent = 'Email sent';
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Send Reset Link';
+  }
+}
+
+let _resetToken = null;
+
+async function doResetPassword() {
+  const password = document.getElementById('rp-password').value;
+  const confirm = document.getElementById('rp-confirm').value;
+  const errEl = document.getElementById('rp-error');
+  const successEl = document.getElementById('rp-success');
+  const btn = document.getElementById('rp-btn');
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+  if (!password || !confirm) { errEl.textContent = 'Please fill in both fields.'; errEl.style.display = 'block'; return; }
+  if (password !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await fetch('/api/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: _resetToken, password }) });
+    const d = await res.json();
+    if (!res.ok) { errEl.textContent = d.error; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Set New Password'; return; }
+    successEl.textContent = 'Password updated! You can now sign in with your new password.';
+    successEl.style.display = 'block';
+    btn.textContent = 'Done';
+    // Clean URL and show sign-in after a moment
+    history.replaceState({}, '', '/');
+    _resetToken = null;
+    setTimeout(() => showSignIn(), 2500);
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Set New Password';
+  }
+}
+
 async function afterAuth(showSuccessBanner) {
   await loadUserDataFromServer();
   setLanguage(data.settings.language || 'en');
@@ -1018,7 +1115,24 @@ async function openPortal() {
 }
 
 async function initApp() {
-  const subscribed = new URLSearchParams(window.location.search).get('subscribed') === '1';
+  const params = new URLSearchParams(window.location.search);
+  const subscribed = params.get('subscribed') === '1';
+  const resetToken = params.get('resetToken');
+
+  // Handle password reset link
+  if (resetToken) {
+    _resetToken = resetToken;
+    history.replaceState({}, '', '/');
+    document.getElementById('auth-overlay').style.display = 'flex';
+    document.getElementById('form-signin').style.display = 'none';
+    document.getElementById('form-signup').style.display = 'none';
+    document.getElementById('form-forgot').style.display = 'none';
+    document.getElementById('form-reset').style.display = '';
+    document.getElementById('tab-signin').classList.remove('active');
+    document.getElementById('tab-signup').classList.remove('active');
+    return;
+  }
+
   if (authToken) {
     try {
       const res = await fetch('/api/user/me', { headers: getHeaders() });

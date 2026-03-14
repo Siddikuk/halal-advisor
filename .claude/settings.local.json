@@ -5,7 +5,12 @@
       "Bash(git restore:*)",
       "Bash(git commit:*)",
       "Bash(git pull:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(grep -r \"password.*reset\\\\|forgot.*password\\\\|reset\" /c/Users/zabid/halal-advisor --include=\"*.js\" --include=\"*.html\" --include=\"*.ts\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"nodemailer\\\\|sendgrid\\\\|email\\\\|mail\" /c/Users/zabid/halal-advisor --include=\"*.js\" --include=\"*.json\" 2>/dev/null | grep -v node_modules | head -20)",
+      "Bash(find /c/Users/zabid/halal-advisor -type f \\\\\\( -name \"*.html\" -o -name \"*.js\" \\\\\\) ! -path \"*/node_modules/*\" | xargs grep -l \"delete.*account\\\\|email\" 2>/dev/null)",
+      "Bash(npm list:*)",
+      "Bash(cd \"C:/Users/zabid/halal-advisor\" && npm install nodemailer --save)"
     ]
   }
 }

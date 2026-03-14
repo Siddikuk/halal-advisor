@@ -6,6 +6,8 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Stripe = require('stripe');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 // ─────────────────────────────────────────────
 // DATABASE (PostgreSQL)
@@ -38,6 +40,15 @@ async function initDb() {
       PRIMARY KEY (user_id, data_key)
     )
   `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id         SERIAL PRIMARY KEY,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      token      TEXT NOT NULL UNIQUE,
+      expires_at BIGINT NOT NULL,
+      used       BOOLEAN DEFAULT FALSE
+    )
+  `);
 }
 
 // ─────────────────────────────────────────────
@@ -47,6 +58,45 @@ async function initDb() {
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
   : null;
+
+// Email transporter (configure EMAIL_USER + EMAIL_PASS in .env)
+const emailTransporter = (process.env.EMAIL_USER && process.env.EMAIL_PASS)
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+    })
+  : null;
+
+async function sendPasswordResetEmail(toEmail, resetUrl) {
+  if (!emailTransporter) {
+    console.warn('[email] EMAIL_USER / EMAIL_PASS not set — password reset email not sent. Reset URL:', resetUrl);
+    return;
+  }
+  await emailTransporter.sendMail({
+    from: `"Halal Advisor" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: 'Reset your Halal Advisor password',
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;">
+        <h2 style="color:#1a5c38;font-size:1.4rem;margin-bottom:8px;">☽ Halal Advisor</h2>
+        <p style="color:#333;font-size:0.95rem;line-height:1.6;">
+          We received a request to reset the password for your account (<strong>${toEmail}</strong>).
+        </p>
+        <p style="color:#333;font-size:0.95rem;line-height:1.6;">
+          Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.
+        </p>
+        <a href="${resetUrl}" style="display:inline-block;margin:20px 0;padding:12px 28px;background:#1a5c38;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:0.95rem;">
+          Reset Password
+        </a>
+        <p style="color:#718096;font-size:0.8rem;margin-top:24px;">
+          If you did not request a password reset, you can safely ignore this email — your password will not change.
+        </p>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
+        <p style="color:#a0aec0;font-size:0.75rem;">Halal Advisor · Islamic Financial Guidance</p>
+      </div>
+    `
+  });
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'halal-advisor-dev-secret-change-in-production';
 const TRIAL_DAYS = 14;
@@ -182,6 +232,60 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     console.error('[login]', err.message);
     res.status(500).json({ error: 'Login failed. Please try again.' });
+  }
+});
+
+// POST /api/auth/forgot-password
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required.' });
+  // Always respond OK so we don't reveal whether the email exists
+  res.json({ ok: true });
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+    if (!rows.length) return; // No account — silently do nothing
+    const userId = rows[0].id;
+    // Delete any existing unexpired tokens for this user
+    await pool.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [userId]);
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
+    await pool.query(
+      'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+      [userId, token, expiresAt]
+    );
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const resetUrl = `${appUrl}/?resetToken=${token}`;
+    await sendPasswordResetEmail(email.toLowerCase(), resetUrl);
+    console.log('[forgot-password] Reset link sent to', email.toLowerCase());
+  } catch (err) {
+    console.error('[forgot-password]', err.message);
+  }
+});
+
+// POST /api/auth/reset-password
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) return res.status(400).json({ error: 'Token and new password required.' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM password_reset_tokens WHERE token = $1 AND used = FALSE',
+      [token]
+    );
+    if (!rows.length) return res.status(400).json({ error: 'Invalid or expired reset link.' });
+    const record = rows[0];
+    if (Date.now() > Number(record.expires_at)) {
+      await pool.query('DELETE FROM password_reset_tokens WHERE id = $1', [record.id]);
+      return res.status(400).json({ error: 'This reset link has expired. Please request a new one.' });
+    }
+    const hash = await bcrypt.hash(password, 12);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, record.user_id]);
+    await pool.query('UPDATE password_reset_tokens SET used = TRUE WHERE id = $1', [record.id]);
+    console.log('[reset-password] Password reset for user', record.user_id);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[reset-password]', err.message);
+    res.status(500).json({ error: 'Password reset failed. Please try again.' });
   }
 });
 
