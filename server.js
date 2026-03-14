@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Stripe = require('stripe');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const crypto = require('crypto');
 
 // ─────────────────────────────────────────────
@@ -59,21 +59,15 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
   : null;
 
-// Email transporter (configure EMAIL_USER + EMAIL_PASS in .env)
-const emailTransporter = (process.env.EMAIL_USER && process.env.EMAIL_PASS)
-  ? nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-    })
-  : null;
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 async function sendPasswordResetEmail(toEmail, resetUrl) {
-  if (!emailTransporter) {
-    console.warn('[email] EMAIL_USER / EMAIL_PASS not set — password reset email not sent. Reset URL:', resetUrl);
+  if (!resend) {
+    console.warn('[email] RESEND_API_KEY not set — password reset email not sent. Reset URL:', resetUrl);
     return;
   }
-  await emailTransporter.sendMail({
-    from: `"Halal Advisor" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: 'Halal Advisor <noreply@halaladvisor.app>',
     to: toEmail,
     subject: 'Reset your Halal Advisor password',
     html: `
