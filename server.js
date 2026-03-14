@@ -67,7 +67,7 @@ async function sendPasswordResetEmail(toEmail, resetUrl) {
     return;
   }
   await resend.emails.send({
-    from: 'Halal Advisor <noreply@halaladvisor.app>',
+    from: 'Halal Advisor <onboarding@resend.dev>',
     to: toEmail,
     subject: 'Reset your Halal Advisor password',
     html: `
